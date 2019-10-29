@@ -1,5 +1,4 @@
 .DS_Store
-islr.pdf
-esl_2e.pdf
 .ipynb_checkpoints
 .idea
+__pycache__
