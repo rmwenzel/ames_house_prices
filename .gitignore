@@ -1,3 +1,5 @@
-__pycache__/
-codes/__pycache__
-.ipynb_checkpoints/
+.DS_Store
+islr.pdf
+esl_2e.pdf
+.ipynb_checkpoints
+.idea
