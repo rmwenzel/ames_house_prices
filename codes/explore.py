@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 """Helper functions for exploratory analysis of Ames housing dataset."""
 
 import matplotlib.pyplot as plt
@@ -14,6 +12,7 @@ from sklearn.preprocessing import LabelEncoder
 from itertools import combinations
 # custom classes
 from codes.process import DataDescription, HPDataFramePlus, DataPlus
+
 
 # add root site-packages directory to workaround pyitlib pip install issue
 sys.path.append('/Users/home/anaconda3/lib/python3.7/site-packages')
@@ -212,24 +211,6 @@ def plot_log_cont_dists(nrows, ncols, data, log_cols, figsize=None):
     log_df = log_df[log_df > 0]
     log_df = np.log(log_df)
     plot_cont_dists(nrows, ncols, log_df, figsize=figsize)
-
-
-def minmax_df(data):
-    """Maximum and minimum values of all variables."""
-    min_df = data.min()
-    max_df = data.max()
-    df = pd.concat([min_df, max_df], axis=1)
-    df.columns = ['min', 'max']
-    return df
-
-
-def do_col_kinds(clean):
-    """Set col_kinds attribute."""
-    col_kinds = {}
-    col_kinds['cat'] = list(clean.data.select_dtypes('category').columns)
-    col_kinds['ord'] = list(clean.data.select_dtypes('int64').columns)
-    col_kinds['quant'] = list(clean.data.select_dtypes('float64').columns)
-    clean.col_kinds = col_kinds
 
 
 def plot_corr(quants_data, figsize=None):

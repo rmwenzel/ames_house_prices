@@ -555,21 +555,20 @@ class DataFramePlus:
         Returns
         -------
         copy: DataFramePlus
-            copy of dataframe with all categorical columns one-hot encoded and
-            all columns scaled
+            copy of dataframe with all categorical columns one-hot encoded
+            and all columns scaled
 
         """
         copy = self.data.copy()
         resp = copy[response]
-        copy.drop(columns=response)
+        copy = copy.drop(columns=response)
 
         # one-hot encode categorical variables
         copy = pd.get_dummies(copy, columns=self.col_kinds['cat'])
 
         # scale
         sc = MinMaxScaler()
-        copy.loc['train'] = sc.fit_transform(copy.loc['train'])
-        copy.loc['test'] = sc.transform(copy.loc['test'])
+        copy.loc[:, :] = sc.fit_transform(copy)
         copy.loc[:, response] = resp
         return copy
 
