@@ -6,6 +6,7 @@ import os
 import sys
 import time
 import json
+import copy
 
 from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from sklearn.linear_model import (LinearRegression, Lasso, Ridge,
@@ -16,8 +17,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from sklearn.neural_network import MLPRegressor
 from sklearn.tree import DecisionTreeRegressor, ExtraTreeRegressor
 from sklearn.metrics import mean_squared_error
-from sklearn.model_selection import (KFold, cross_val_score,
-                                     GridSearchCV, RandomizedSearchCV)
+from sklearn.model_selection import KFold, cross_val_score
 from sklearn.ensemble import (AdaBoostRegressor, BaggingRegressor, ExtraTreesRegressor, GradientBoostingRegressor,
                               RandomForestRegressor, VotingRegressor)
 from xgboost import XGBRegressor
@@ -240,34 +240,27 @@ def rmse(model, X_train, y_train, n_splits=5, shuffle=True,
     """Train and cv rmse of model."""
     kf = KFold(n_splits=n_splits, shuffle=shuffle, random_state=random_state)
 
-    train_rmse = np.sqrt(mean_squared_error(model.predict(X_train), y_train))
-    cv_scores = - cross_val_score(estimator=model, X=X_train, y=y_train,
-                                  cv=kf, scoring='neg_mean_squared_error',
+    y_pred = model.predict(X_train.values)
+    train_rmse = np.sqrt(mean_squared_error(y_pred, y_train))
+    cv_scores = - cross_val_score(estimator=model, X=X_train.values,
+                                  y=y_train, cv=kf,
+                                  scoring='neg_mean_squared_error',
                                   n_jobs=-1)
     cv_rmse = np.sqrt(np.mean(cv_scores))
     return train_rmse, cv_rmse
 
 
-def fit_default_models(model_data, random_state=None):
+def fit_default_models(model_data, default_models):
     """Fit some regressors to all datasets."""
-    def_models = defaultdict(dict)
+    fit_models = defaultdict(dict)
     for data_name in model_data:
-        models = {'lasso': Lasso(), 'ridge': Ridge(),
-                  'bayes_ridge': BayesianRidge(),
-                  'plsreg': PLSRegression(), 'svr': SVR(),
-                  'knn': KNeighborsRegressor(),
-                  'mlp': MLPRegressor(),
-                  'dec_tree': DecisionTreeRegressor(random_state=random_state
-                                                    ),
-                  'extra_tree': ExtraTreeRegressor(random_state=random_state),
-                  'xgb': XGBRegressor(objective='reg:squarederror',
-                                      random_state=random_state,
-                                      n_jobs=-1)}
-        for model in models:
+        def_models = copy.deepcopy(default_models)
+        for model in default_models:
             X_train = model_data[data_name]['X_' + data_name + '_train']
             y_train = model_data[data_name]['y_' + data_name + '_train']
-            def_models[data_name][model] = models[model].fit(X_train, y_train)
-    return def_models
+            fit = def_models[model].fit(X_train.values, y_train.values)
+            fit_models[data_name][model] = fit
+    return fit_models
 
 
 def model_comparison(fit_models, data_name, model_data,
@@ -311,15 +304,15 @@ def plot_model_comp(comp_df, col, hue, **kwargs):
 
 def remove_models(models, drop_models):
     """Drop models from consideration."""
-    copy = models.copy()
-    for data_name in copy:
-        for model in drop_models:
-            copy[data_name].pop(model)
-    return copy
+    models = copy.deepcopy(models)
+    for data_name in models:
+        for model_name in drop_models:
+            models[data_name].pop(model_name)
+    return models
 
 
 def ho_cv_rmse(search_params, X_train, y_train, fixed_params={},
-               est_name='bayes_ridge', n_splits=5, shuffle=True,
+               est_name, n_splits=5, shuffle=True,
                random_state=None):
     """CV rmse objective function for hyperopt parameter search."""
     if est_name == 'ridge':
@@ -364,14 +357,16 @@ def rank_features(model, model_name, X_train, num_features,
                            index=np.arange(X_train.shape[1]))
 
     plt.subplot(1, 2, 1)
-    top_df = coef_df.sort_values(by='coef', ascending=False).head(num_features)
+    top_df = coef_df.sort_values(by='coef', ascending=False)
+    top_df = top_df.head(num_features)
     plt.title('Best ' + model_name + ' ' + str(num_features) +
               ' most positive feature weights')
     sns.barplot(x='feature', y='coef', data=top_df, palette='Greens_r')
     plt.xticks(rotation=rotation)
 
     plt.subplot(1, 2, 2)
-    bot_df = coef_df.sort_values(by='coef', ascending=False).tail(num_features)
+    bot_df = coef_df.sort_values(by='coef', ascending=False)
+    bot_df = bot_df.tail(num_features)
     plt.title('Best ' + model_name + ' ' + str(num_features) +
               ' most negative feature weights')
     sns.barplot(x='feature', y='coef', data=bot_df, palette='Reds_r')
@@ -403,7 +398,59 @@ def convert_to_int(ho_results, conv_params):
     """Workaround for hyperopt search not returning ints."""
     copy = ho_results.copy()
     for param in conv_params:
-        copy = int(copy[param])
-
-
+        copy[param] = int(copy[param])
     return copy
+
+
+def rank_xgb_features(xgb_model, X_train, num_features, figsize=None,
+                      rotation=None):
+    """Plot most important features of xgb model."""
+    plt.figure(figsize=figsize)
+    imp_df = pd.DataFrame({'feature': X_train.columns,
+                          'importance': xgb_model.feature_importances_},
+                          index=np.arange(X_train.shape[1]))
+    top_df = imp_df.sort_values(by='importance', ascending=False)
+    top_df = top_df.head(num_features)
+    plt.title('Best xgb model ' + str(num_features) +
+              ' most important features')
+    sns.barplot(x='feature', y='importance', data=top_df, palette='Greens_r')
+    plt.xticks(rotation=rotation)
+
+
+def save_tuned_params(models, save_path):
+    """Save tuned model parameters in json file."""
+    params = defaultdict(dict)
+    for data_name in models:
+        for model_name in models[data_name]:
+            model_params = models[data_name][model_name].get_params()
+            params[data_name][model_name] = model_params
+    with open(save_path, 'w+') as f:
+        json.dump(params, f)
+
+
+def models_from_params(load_path, model_data):
+    """Load and fit models from parameters json file."""
+    models = defaultdict(dict)
+    with open(load_path, 'r') as f:
+        params = json.load(f)
+
+    for data_name in params:
+
+        X_train = model_data[data_name]['X_' + data_name + '_train']
+        y_train = model_data[data_name]['y_' + data_name + '_train']
+
+        for model_name in params[data_name]:
+            model_params = params[data_name][model_name]
+            if model_name == 'ridge':
+                models[data_name][model_name] = Ridge(**model_params)
+            elif model_name == 'bridge':
+                models[data_name][model_name] = BayesianRidge(**model_params)
+            elif model_name == 'pls':
+                models[data_name][model_name] = PLSRegression(**model_params)
+            elif model_name == 'svr':
+                models[data_name][model_name] = SVR(**model_params)
+            elif model_name == 'xgb':
+                models[data_name][model_name] = XGBRegressor(**model_params)
+            models[data_name][model_name].fit(X_train, y_train)
+
+    return models
