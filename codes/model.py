@@ -1,36 +1,24 @@
+"""Helpers for predictive modeling of SalePrice in Ames housing data in \
+model.ipynb."""
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import os
-import sys
-import time
-import json
+import pickle
 import copy
 
-from sklearn.preprocessing import LabelEncoder, MinMaxScaler
-from sklearn.linear_model import (LinearRegression, Lasso, Ridge,
-                                  RidgeCV, BayesianRidge)
+from sklearn.linear_model import Ridge, BayesianRidge
 from sklearn.cross_decomposition import PLSRegression
 from sklearn.svm import SVR
-from sklearn.neighbors import KNeighborsRegressor
-from sklearn.neural_network import MLPRegressor
-from sklearn.tree import DecisionTreeRegressor, ExtraTreeRegressor
+from sklearn.ensemble import VotingRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import KFold, cross_val_score
-from sklearn.ensemble import (AdaBoostRegressor, BaggingRegressor, ExtraTreesRegressor, GradientBoostingRegressor,
-                              RandomForestRegressor, VotingRegressor)
 from xgboost import XGBRegressor
 from mlxtend.regressor import StackingCVRegressor
-from hyperopt import fmin, hp, tpe, Trials, space_eval, STATUS_OK
-from hyperopt.pyll import scope as ho_scope
-from hyperopt.pyll.stochastic import sample as ho_sample
+from hyperopt import fmin, tpe, Trials
 from functools import partial
 from collections import defaultdict
-
-# custom classes
-from codes.process import DataDescription, HPDataFramePlus, DataPlus
-from codes.explore import load_datasets
 
 
 def print_small_val_counts(data, val_count_threshold):
@@ -311,8 +299,8 @@ def remove_models(models, drop_models):
     return models
 
 
-def ho_cv_rmse(search_params, X_train, y_train, fixed_params={},
-               est_name, n_splits=5, shuffle=True,
+def ho_cv_rmse(search_params, X_train, y_train, est_name,
+               fixed_params={}, n_splits=5, shuffle=True,
                random_state=None):
     """CV rmse objective function for hyperopt parameter search."""
     if est_name == 'ridge':
@@ -327,7 +315,7 @@ def ho_cv_rmse(search_params, X_train, y_train, fixed_params={},
         est = XGBRegressor(**{**search_params, **fixed_params},
                            objective='reg:squarederror',
                            random_state=random_state, n_jobs=-1)
-    est.fit(X_train, y_train)
+    est.fit(X_train.values, y_train.values)
     _, cv_rmse = rmse(model=est, X_train=X_train, y_train=y_train,
                       n_splits=n_splits, shuffle=shuffle,
                       random_state=random_state)
@@ -336,16 +324,18 @@ def ho_cv_rmse(search_params, X_train, y_train, fixed_params={},
 
 def ho_results(obj, space, est_name, X_train, y_train,
                fixed_params={}, max_evals=10,
-               n_splits=5, shuffle=True, random_state=None):
+               n_splits=5, shuffle=True, random_state=None,
+               trials=None):
     """Hyperopt parameter search results."""
     fn = partial(obj, X_train=X_train, y_train=y_train,
                  fixed_params=fixed_params, est_name=est_name,
                  n_splits=n_splits, shuffle=shuffle,
                  random_state=random_state)
-    trials = Trials()
+    if not trials:
+        trials = Trials()
     params = fmin(fn=fn, space=space, algo=tpe.suggest, trials=trials,
                   max_evals=max_evals)
-    return trials, params
+    return {'trials': trials, 'params': params}
 
 
 def rank_features(model, model_name, X_train, num_features,
@@ -417,40 +407,232 @@ def rank_xgb_features(xgb_model, X_train, num_features, figsize=None,
     plt.xticks(rotation=rotation)
 
 
-def save_tuned_params(models, save_path):
-    """Save tuned model parameters in json file."""
+def pickle_to_file(models, file_path):
+    """Pickle object to file."""
+    with open(file_path, 'wb') as f:
+        pickle.dump(models, f)
+
+
+def pickle_from_file(file_path):
+    """Load object from pickle file."""
+    with open(file_path, 'rb') as f:
+        models = pickle.load(f)
+    return models
+
+
+def convert_and_normalize_weights(voter_weights):
+    """Normalize weight."""
+    voter_weights = np.array(voter_weights)
+    voter_weights /= voter_weights.sum()
+    return voter_weights
+
+
+def convert_search_params(search_params):
+    """Package results of ensemble hyperparameter searchs into dict."""
+    ridge_params = {key.replace('_ridge', ''): value for (key, value)
+                    in search_params.items() if '_ridge' in key and '_meta'
+                    not in key}
+    svr_params = {key.replace('_svr', ''): value for (key, value)
+                  in search_params.items() if '_svr' in key and
+                  '_meta' not in key}
+    xgb_params = {key.replace('_xgb', ''): value for (key, value)
+                  in search_params.items()
+                  if '_xgb' in key and '_meta' not in key}
+    voter_weights = [value for (key, value) in search_params.items()
+                     if 'voter' in key]
+    meta_params = {key.replace('_meta', ''): value for (key, value)
+                   in search_params.items() if '_meta' in key}
     params = defaultdict(dict)
-    for data_name in models:
-        for model_name in models[data_name]:
-            model_params = models[data_name][model_name].get_params()
-            params[data_name][model_name] = model_params
-    with open(save_path, 'w+') as f:
-        json.dump(params, f)
+
+    if ridge_params:
+        params['ridge'] = ridge_params
+    if svr_params:
+        params['svr'] = svr_params
+    if xgb_params:
+        params['xgb'] = xgb_params
+    if voter_weights:
+        voter_weights = convert_and_normalize_weights(voter_weights)
+        params['weights'] = voter_weights
+    if meta_params:
+        params['meta'] = convert_search_params(meta_params)
+
+    return params
 
 
-def models_from_params(load_path, model_data):
-    """Load and fit models from parameters json file."""
-    models = defaultdict(dict)
-    with open(load_path, 'r') as f:
-        params = json.load(f)
+def voter_from_search_params(search_params, X_train, y_train,
+                             random_state=None, fixed_params={}):
+    """Fit a voting regressor with results of hyperparameter search."""
+    voter_params = convert_search_params(search_params)
 
-    for data_name in params:
+    conv_params = ['max_depth', 'min_child_weight', 'n_estimators']
+    voter_params['xgb'] = convert_to_int(voter_params['xgb'], conv_params)
+    voter_base_tuned = [('ridge', Ridge(**voter_params['ridge'])),
+                        ('svr', SVR(**voter_params['svr'])),
+                        ('xgb', XGBRegressor(**voter_params['xgb'],
+                                             objective='reg:squarederror',
+                                             n_jobs=-1,
+                                             random_state=random_state))]
+    weights_tuned = convert_and_normalize_weights(voter_params['weights'])
+    voter = VotingRegressor(voter_base_tuned, weights=weights_tuned,
+                            **fixed_params)
+    voter.fit(X_train.values, y_train.values)
+    return voter
+
+
+def stack_from_search_params(search_params, X_train, y_train, meta_name,
+                             random_state=None, fixed_params={}):
+    """Fit a voting regressor with results of hyperparameter search."""
+    stack_params = convert_search_params(search_params)
+
+    conv_params = ['max_depth', 'min_child_weight', 'n_estimators']
+    stack_params['xgb'] = convert_to_int(stack_params['xgb'], conv_params)
+
+    try:
+        xgb_params = stack_params['meta']['xgb']
+        stack_params['meta']['xgb'] = convert_to_int(xgb_params, conv_params)
+    except KeyError:
+        pass
+
+    base_ests = {'ridge': Ridge(**stack_params['ridge']),
+                 'svr': SVR(**stack_params['svr']),
+                 'xgb': XGBRegressor(**stack_params['xgb'],
+                                     objective='reg:squarederror',
+                                     n_jobs=-1, random_state=random_state)}
+    meta_params = stack_params['meta'][meta_name]
+    meta_est = copy.deepcopy(base_ests[meta_name]).set_params(**meta_params)
+    stack = StackingCVRegressor(regressors=list(base_ests.values()),
+                                meta_regressor=meta_est,
+                                random_state=random_state,
+                                **fixed_params)
+
+    stack.fit(X_train.values, y_train.values)
+    return stack
+
+
+def ho_ens_cv_rmse(search_params, ens_name, X_train, y_train, pretuned=False,
+                   base_ests=None, meta_ests=None, meta_name=None,
+                   fixed_params={}, n_splits=5, shuffle=True,
+                   random_state=None):
+    """CV rmse objective for hyperopt parameter search for ensembles."""
+    params = convert_search_params(search_params)
+    if ens_name == 'voter' and pretuned:
+        est = VotingRegressor(list(base_ests.items()),
+                              weights=params['weights'], **fixed_params)
+    elif ens_name == 'stack' and pretuned:
+        est = StackingCVRegressor(regressors=list(base_ests.values()),
+                                  meta_regressor=meta_ests[meta_name],
+                                  **fixed_params)
+    elif ens_name == 'voter':
+        est = voter_from_search_params(search_params, X_train, y_train,
+                                       fixed_params=fixed_params,
+                                       random_state=random_state)
+
+    elif ens_name == 'stack':
+        est = stack_from_search_params(search_params, X_train, y_train,
+                                       meta_name=meta_name,
+                                       fixed_params=fixed_params,
+                                       random_state=random_state)
+
+    est.fit(X_train.values, y_train.values)
+    _, cv_rmse = rmse(model=est, X_train=X_train, y_train=y_train,
+                      n_splits=n_splits, shuffle=shuffle,
+                      random_state=random_state)
+    return cv_rmse
+
+
+def ho_ens_results(obj, space, ens_name, X_train, y_train,
+                   pretuned=False, base_ests=None,
+                   meta_ests=None, meta_name=None, fixed_params={},
+                   n_splits=5, shuffle=True,
+                   random_state=None, max_evals=10, trials=None):
+    """Hyperopt parameter search results for ensembles."""
+    fn = partial(obj, ens_name=ens_name, X_train=X_train, y_train=y_train,
+                 pretuned=pretuned, base_ests=base_ests, meta_ests=meta_ests,
+                 meta_name=meta_name, fixed_params=fixed_params,
+                 n_splits=n_splits, shuffle=shuffle, random_state=random_state)
+    if not trials:
+        trials = Trials()
+    params = fmin(fn=fn, space=space, algo=tpe.suggest, trials=trials,
+                  max_evals=max_evals)
+    return {'trials': trials, 'params': params}
+
+
+def add_stacks(ensembles, model_data, base_ests=None, meta_ests=None,
+               suffix='', use_features_in_secondary=False,
+               random_state=None):
+    """Create stacking regressors from list of meta regressors."""
+    ensembles = copy.deepcopy(ensembles)
+
+    for data_name in ensembles:
 
         X_train = model_data[data_name]['X_' + data_name + '_train']
         y_train = model_data[data_name]['y_' + data_name + '_train']
 
-        for model_name in params[data_name]:
-            model_params = params[data_name][model_name]
-            if model_name == 'ridge':
-                models[data_name][model_name] = Ridge(**model_params)
-            elif model_name == 'bridge':
-                models[data_name][model_name] = BayesianRidge(**model_params)
-            elif model_name == 'pls':
-                models[data_name][model_name] = PLSRegression(**model_params)
-            elif model_name == 'svr':
-                models[data_name][model_name] = SVR(**model_params)
-            elif model_name == 'xgb':
-                models[data_name][model_name] = XGBRegressor(**model_params)
-            models[data_name][model_name].fit(X_train, y_train)
+        if not base_ests:
+            base_ests = defaultdict(dict)
+            base_ests[data_name] = {'ridge': Ridge(),
+                                    'svr': SVR(),
+                                    'xgb': XGBRegressor(
+                                           objective='reg:squarederror',
+                                           n_jobs=-1,
+                                           random_state=random_state)}
 
-    return models
+        if not meta_ests:
+            meta_ests = defaultdict(dict)
+            meta_ests[data_name] = {'ridge': Ridge(),
+                                    'svr': SVR(),
+                                    'xgb': XGBRegressor(
+                                           objective='reg:squarederror',
+                                           n_jobs=-1,
+                                           random_state=random_state)}
+
+        for meta_name in meta_ests[data_name]:
+            stack_name = ('stack_' +
+                          meta_name.replace('_tuned', '')
+                          + '_' + suffix)
+            if use_features_in_secondary:
+                stack_name += '_second'
+
+            bases = list(base_ests[data_name].values())
+            meta = meta_ests[data_name][meta_name]
+            stack = StackingCVRegressor(regressors=bases,
+                                        meta_regressor=meta,
+                                        use_features_in_secondary=use_features_in_secondary,
+                                        random_state=random_state,
+                                        n_jobs=-1)
+            stack.fit(X_train.values, y_train.values)
+            ensembles[data_name][stack_name] = stack
+
+    return ensembles
+
+
+def compare_ens_performance(ensembles, ens_ho_results, model_data,
+                            n_splits=5, shuffle=True, random_state=None):
+    """Compare default models across datasets."""
+    comp_dfs = []
+    for data_name in model_data:
+        fit_models = defaultdict(dict)
+        fit_models[data_name] = {model_name: model for (model_name, model)
+                                 in ensembles[data_name].items() if
+                                 model_name not in
+                                 ens_ho_results[data_name]}
+        model_comp_df = model_comparison(fit_models, data_name, model_data,
+                                         n_splits=5, shuffle=True,
+                                         random_state=None)
+        for model_name in ens_ho_results[data_name]:
+            trial = ens_ho_results[data_name][model_name][0]
+            cv_rmse = trial.best_trial['result']['loss']
+            X_train = model_data[data_name]['X_' + data_name + '_train']
+            y_train = model_data[data_name]['y_' + data_name + '_train']
+            y_pred = ensembles[data_name][model_name].predict(X_train.values)
+            train_rmse = np.sqrt(mean_squared_error(y_pred, y_train))
+            df = pd.DataFrame({'train_rmse': train_rmse, 'cv_rmse': cv_rmse},
+                              index=[model_name])
+            model_comp_df.append(df)
+        comp_dfs += [model_comp_df]
+
+    comp_df = pd.concat(comp_dfs, axis=1, keys=list(model_data.keys()),
+                        names=['data', 'performance'])
+    comp_df = comp_df.reset_index().rename(columns={'index': 'model'})
+
+    return comp_df

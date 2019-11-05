@@ -1,17 +1,16 @@
-"""Helper functions for exploratory analysis of Ames housing dataset."""
+"""Helpers for exploratory analysis of Ames housing data in explore.ipynb."""
 
 import matplotlib.pyplot as plt
 import warnings
 import numpy as np
 import pandas as pd
 import seaborn as sns
-import scipy.stats as ss
 import sys
 import os
 from sklearn.preprocessing import LabelEncoder
 from itertools import combinations
 # custom classes
-from codes.process import DataDescription, HPDataFramePlus, DataPlus
+from codes.process import HPDataFramePlus, DataPlus
 
 
 # add root site-packages directory to workaround pyitlib pip install issue
