@@ -1,0 +1,3218 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+  <head>
+  <link href="http://gmpg.org/xfn/11" rel="profile">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+  <!-- Enable responsiveness on mobile devices-->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+
+  <title>
+    
+      Exploratory analysis &middot; Ames Housing Data
+    
+  </title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/temp/public/css/poole.css">
+  <link rel="stylesheet" href="/temp/public/css/syntax.css">
+  <link rel="stylesheet" href="/temp/public/css/lanyon.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
+
+  <!-- Icons
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/temp/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/temp/public/favicon.ico">
+  --->
+
+  <!-- RSS -->
+  <link rel="alternate" type="application/rss+xml" title="RSS" href="/atom.xml">
+
+  <!--- KaTeX --->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.js" integrity="sha384-9Nhn55MVVN0/4OFx7EE5kpFBPsEMZxKTCnA+4fqDmg12eCTqGi6+BB2LjY8brQxJ" crossorigin="anonymous"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/contrib/auto-render.min.js" integrity="sha384-kWPLUVMOks5AQFrykwIup5lo0m3iMkkHrD0uJ4H5cjeGihAutqP0yW0J6dpFiVkI" crossorigin="anonymous"
+      onload="renderMathInElement(document.body);"></script>
+</head>
+
+
+  <body>
+
+    <!-- Target for toggling the sidebar `.sidebar-checkbox` is for regular
+     styles, `#sidebar-checkbox` for behavior. -->
+<input type="checkbox" class="sidebar-checkbox" id="sidebar-checkbox">
+
+<!-- Toggleable sidebar -->
+<div class="sidebar" id="sidebar">
+
+  <nav class="sidebar-nav">
+
+    <a class="sidebar-nav-item" href="/temp/process/">Process</a>
+    <a class="sidebar-nav-item active" href="/temp/explore/">Explore</a>
+    <a class="sidebar-nav-item" href="/temp/model/">Model</a>
+
+  </nav>
+
+  <div class="sidebar-item">
+    <p>
+      &copy; 2019.
+    </p>
+  </div>
+</div>
+
+
+    <!-- Wrap is the content to shift when toggling the sidebar. We wrap the
+         content to avoid any CSS collisions with our real content. -->
+    <div class="wrap">
+      <div class="masthead">
+        <div class="container">
+          <h3 class="masthead-title">
+            <a href="/temp/" title="Home">Ames Housing Data</a>
+            <small>Analysis and predictive modeling of sale price</small>
+          </h3>
+        </div>
+      </div>
+
+      <div class="container content">
+        <div class="page">
+  <h1 class="page-title">Exploratory analysis</h1>
+  	<p>Previously, we <a href="/temp/process/">processed and cleaned</a> the Ames housing dataset. In this notebook, we focus on exploring the variables and the relationships among them. Later we’ll <a href="/temp/model/">model and predict sale prices</a>.</p>
+
+<h2>Contents<span class="tocSkip"></span></h2>
+<div class="toc">
+  <ul class="toc-item"><li><span><a href="#Setup" data-toc-modified-id="Setup-1">Setup</a></span></li><li><span><a href="#Load-and-inspect-data" data-toc-modified-id="Load-and-inspect-data-2">Load and inspect data</a></span></li><li><span><a href="#The-response-variable-SalePrice" data-toc-modified-id="The-response-variable-SalePrice-3">The response variable <code>SalePrice</code></a></span><ul class="toc-item"><li><span><a href="#Testing-log-normality" data-toc-modified-id="Testing-log-normality-3.1">Testing log-normality</a></span><ul class="toc-item"><li><span><a href="#QQ-plot" data-toc-modified-id="QQ-plot-3.1.1">QQ-plot</a></span></li><li><span><a href="#Kolmogorov---Smirnov-test" data-toc-modified-id="Kolmogorov---Smirnov-test-3.1.2">Kolmogorov - Smirnov test</a></span></li></ul></li></ul></li><li><span><a href="#Categorical-variables" data-toc-modified-id="Categorical-variables-4">Categorical variables</a></span><ul class="toc-item"><li><span><a href="#Distributions" data-toc-modified-id="Distributions-4.1">Distributions</a></span></li><li><span><a href="#Relationships-among-categorical-variables" data-toc-modified-id="Relationships-among-categorical-variables-4.2">Relationships among categorical variables</a></span></li><li><span><a href="#Relationships-between-categoricals-and-SalePrice" data-toc-modified-id="Relationships-between-categoricals-and-SalePrice-4.3">Relationships between categoricals and <code>SalePrice</code></a></span></li></ul></li><li><span><a href="#Ordinal-variables" data-toc-modified-id="Ordinal-variables-5">Ordinal variables</a></span><ul class="toc-item"><li><span><a href="#Distributions" data-toc-modified-id="Distributions-5.1">Distributions</a></span></li><li><span><a href="#Relationships-among-ordinal-variables" data-toc-modified-id="Relationships-among-ordinal-variables-5.2">Relationships among ordinal variables</a></span></li><li><span><a href="#Relationships-between-ordinals-and-SalePrice" data-toc-modified-id="Relationships-between-ordinals-and-SalePrice-5.3">Relationships between ordinals and <code>SalePrice</code></a></span><ul class="toc-item"><li><span><a href="#Rank-correlation-hypothesis-tests" data-toc-modified-id="Rank-correlation-hypothesis-tests-5.3.1">Rank correlation hypothesis tests</a></span></li></ul></li></ul></li><li><span><a href="#Quantitative-variables" data-toc-modified-id="Quantitative-variables-6">Quantitative variables</a></span><ul class="toc-item"><li><span><a href="#Relationships-among-quantitative-variables" data-toc-modified-id="Relationships-among-quantitative-variables-6.1">Relationships among quantitative variables</a></span></li><li><span><a href="#Relationships-between-quantitative-variables-and-SalePrice" data-toc-modified-id="Relationships-between-quantitative-variables-and-SalePrice-6.2">Relationships between quantitative variables and <code>SalePrice</code></a></span></li></ul></li></ul>
+</div>
+
+<h2 id="setup">Setup</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># standard imports</span>
+<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">scipy.stats</span> <span class="k">as</span> <span class="n">ss</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c"># add parent directory for importing custom classes</span>
+<span class="n">pardir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">))</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pardir</span><span class="p">)</span>
+
+<span class="c"># add root site-packages directory to workaround pyitlib pip install issue</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">'/Users/home/anaconda3/lib/python3.7/site-packages'</span><span class="p">)</span>
+
+<span class="c"># custom classes</span>
+<span class="kn">from</span> <span class="nn">codes.process</span> <span class="kn">import</span> <span class="n">DataDescription</span>
+<span class="kn">from</span> <span class="nn">codes.explore</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c"># notebook settings</span>
+<span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">'ignore'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s">'seaborn-white'</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s">'white'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<h2 id="load-and-inspect-data">Load and inspect data</h2>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data_dir</span> <span class="o">=</span> <span class="s">'../data'</span>
+<span class="n">file_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'orig.csv'</span><span class="p">,</span> <span class="s">'clean.csv'</span><span class="p">]</span>
+<span class="n">hp_data</span> <span class="o">=</span> <span class="n">load_datasets</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">file_names</span><span class="p">)</span>
+<span class="n">orig</span><span class="p">,</span> <span class="n">clean</span> <span class="o">=</span> <span class="p">(</span><span class="n">hp_data</span><span class="o">.</span><span class="n">dfs</span><span class="p">[</span><span class="s">'orig'</span><span class="p">],</span> <span class="n">hp_data</span><span class="o">.</span><span class="n">dfs</span><span class="p">[</span><span class="s">'clean'</span><span class="p">])</span>                                    
+</code></pre></div></div>
+
+<p>We have 2 versions of the dataset here (created in <a href="preprocess.ipynb/#Preprocessing-the-Ames-housing-dataset">a previous notebook</a>)</p>
+
+<ul>
+  <li><code class="highlighter-rouge">orig</code> is the original dataset with no preprocessing</li>
+  <li><code class="highlighter-rouge">clean</code> is the preprocessed dataset, with problematic variables and observations dropped and missing values imputed</li>
+</ul>
+
+<p>. In this notebook we’ll primarily be working with the cleaned dataset</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>MSSubClass</th>
+      <th>MSZoning</th>
+      <th>LotFrontage</th>
+      <th>LotArea</th>
+      <th>Street</th>
+      <th>LotShape</th>
+      <th>LandContour</th>
+      <th>Utilities</th>
+      <th>LotConfig</th>
+      <th>LandSlope</th>
+      <th>...</th>
+      <th>ScreenPorch</th>
+      <th>PoolArea</th>
+      <th>PoolQC</th>
+      <th>Fence</th>
+      <th>MiscVal</th>
+      <th>MoSold</th>
+      <th>YrSold</th>
+      <th>SaleType</th>
+      <th>SaleCondition</th>
+      <th>SalePrice</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5" valign="top">train</td>
+      <td>1</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>65.0</td>
+      <td>8450.0</td>
+      <td>Pave</td>
+      <td>0</td>
+      <td>Lvl</td>
+      <td>3</td>
+      <td>Inside</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>2008</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>208500.0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>20</td>
+      <td>RL</td>
+      <td>80.0</td>
+      <td>9600.0</td>
+      <td>Pave</td>
+      <td>0</td>
+      <td>Lvl</td>
+      <td>3</td>
+      <td>FR2</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>5</td>
+      <td>2007</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>181500.0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>68.0</td>
+      <td>11250.0</td>
+      <td>Pave</td>
+      <td>1</td>
+      <td>Lvl</td>
+      <td>3</td>
+      <td>Inside</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>9</td>
+      <td>2008</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>223500.0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>70</td>
+      <td>RL</td>
+      <td>60.0</td>
+      <td>9550.0</td>
+      <td>Pave</td>
+      <td>1</td>
+      <td>Lvl</td>
+      <td>3</td>
+      <td>Corner</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>2006</td>
+      <td>WD</td>
+      <td>Abnorml</td>
+      <td>140000.0</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>84.0</td>
+      <td>14260.0</td>
+      <td>Pave</td>
+      <td>1</td>
+      <td>Lvl</td>
+      <td>3</td>
+      <td>FR2</td>
+      <td>0</td>
+      <td>...</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0.0</td>
+      <td>12</td>
+      <td>2008</td>
+      <td>WD</td>
+      <td>Normal</td>
+      <td>250000.0</td>
+    </tr>
+  </tbody>
+</table>
+  <p>5 rows × 78 columns</p>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+MultiIndex: 2916 entries, (train, 1) to (test, 2919)
+Data columns (total 78 columns):
+MSSubClass       2916 non-null category
+MSZoning         2916 non-null category
+LotFrontage      2916 non-null float64
+LotArea          2916 non-null float64
+Street           2916 non-null category
+LotShape         2916 non-null int64
+LandContour      2916 non-null category
+Utilities        2916 non-null int64
+LotConfig        2916 non-null category
+LandSlope        2916 non-null int64
+Neighborhood     2916 non-null category
+Condition1       2916 non-null category
+Condition2       2916 non-null category
+BldgType         2916 non-null category
+HouseStyle       2916 non-null category
+OverallQual      2916 non-null int64
+OverallCond      2916 non-null int64
+YearBuilt        2916 non-null float64
+YearRemodAdd     2916 non-null float64
+RoofStyle        2916 non-null category
+RoofMatl         2916 non-null category
+Exterior1st      2916 non-null category
+Exterior2nd      2916 non-null category
+MasVnrType       2916 non-null category
+MasVnrArea       2916 non-null float64
+ExterQual        2916 non-null int64
+ExterCond        2916 non-null int64
+Foundation       2916 non-null category
+BsmtQual         2916 non-null int64
+BsmtCond         2916 non-null int64
+BsmtExposure     2916 non-null int64
+BsmtFinType1     2916 non-null int64
+BsmtFinSF1       2916 non-null float64
+BsmtFinType2     2916 non-null int64
+BsmtFinSF2       2916 non-null float64
+BsmtUnfSF        2916 non-null float64
+TotalBsmtSF      2916 non-null float64
+Heating          2916 non-null category
+HeatingQC        2916 non-null int64
+CentralAir       2916 non-null category
+Electrical       2916 non-null category
+1stFlrSF         2916 non-null float64
+2ndFlrSF         2916 non-null float64
+LowQualFinSF     2916 non-null float64
+GrLivArea        2916 non-null float64
+BsmtFullBath     2916 non-null int64
+BsmtHalfBath     2916 non-null int64
+FullBath         2916 non-null int64
+HalfBath         2916 non-null int64
+BedroomAbvGr     2916 non-null int64
+KitchenAbvGr     2916 non-null int64
+KitchenQual      2916 non-null int64
+TotRmsAbvGrd     2916 non-null int64
+Functional       2916 non-null int64
+Fireplaces       2916 non-null int64
+FireplaceQu      2916 non-null int64
+GarageType       2916 non-null category
+GarageYrBlt      2916 non-null float64
+GarageFinish     2916 non-null int64
+GarageCars       2916 non-null int64
+GarageArea       2916 non-null float64
+GarageQual       2916 non-null int64
+GarageCond       2916 non-null int64
+PavedDrive       2916 non-null int64
+WoodDeckSF       2916 non-null float64
+OpenPorchSF      2916 non-null float64
+EnclosedPorch    2916 non-null float64
+3SsnPorch        2916 non-null float64
+ScreenPorch      2916 non-null float64
+PoolArea         2916 non-null float64
+PoolQC           2916 non-null int64
+Fence            2916 non-null int64
+MiscVal          2916 non-null float64
+MoSold           2916 non-null int64
+YrSold           2916 non-null int64
+SaleType         2916 non-null category
+SaleCondition    2916 non-null category
+SalePrice        1457 non-null float64
+dtypes: category(22), float64(23), int64(33)
+memory usage: 1.3+ MB
+</code></pre></div></div>
+
+<h2 id="the-response-variable-saleprice">The response variable <code class="highlighter-rouge">SalePrice</code></h2>
+
+<p>First let’s look at the distribution of <code class="highlighter-rouge">SalePrice</code>, the variable we’ll later be interested in predicting.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sale_price</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:][</span><span class="s">'SalePrice'</span><span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">sale_price</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11c407cc0&gt;
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_12_1.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">swarmplot</span><span class="p">(</span><span class="n">sale_price</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11c580d68&gt;
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_13_1.png" alt="png" /></p>
+
+<p>The distribution is positively skewed, with a long right tail. There are two observations with <code class="highlighter-rouge">SalePrice</code> &gt; 700000, and with a good separation from the rest of the points.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># check skewness of SalePrice</span>
+<span class="n">sale_price</span><span class="o">.</span><span class="n">skew</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1.88374941136315
+</code></pre></div></div>
+
+<h3 id="testing-log-normality">Testing log-normality</h3>
+
+<p>The distribution looks like it may be approximately log-normal, let’s check this</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># distribution of log(SalePrice)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sale_price</span><span class="p">))</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11c733b00&gt;
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_18_1.png" alt="png" /></p>
+
+<h4 id="qq-plot">QQ-plot</h4>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># lognormal QQ plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="c"># standard deviation of log is the shape parameter</span>
+<span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">sale_price</span><span class="p">)</span><span class="o">.</span><span class="n">std</span><span class="p">()</span>
+<span class="n">lognorm</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">lognorm</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+<span class="n">ss</span><span class="o">.</span><span class="n">probplot</span><span class="p">(</span><span class="n">sale_price</span><span class="p">,</span> <span class="n">dist</span><span class="o">=</span><span class="n">lognorm</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">plt</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_20_0.png" alt="png" /></p>
+
+<p>The distribution appears to be approxiately log-normal, although the QQ plot shows the right tail is a bit longer than expected, and the two observations with highest <code class="highlighter-rouge">SalePrice</code> are much higher than expected.</p>
+
+<h4 id="kolmogorov---smirnov-test">Kolmogorov - Smirnov test</h4>
+
+<p>This is a <a href="https://en.wikipedia.org/wiki/Kolmogorov%E2%80%93Smirnov_test">non-parametric test for comparing distributions</a>. We’ll use <code class="highlighter-rouge">scipy.stats</code> <a href="https://docs.scipy.org/doc/scipy-0.14.0/reference/generated/scipy.stats.kstest.html">implementation</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ss</span><span class="o">.</span><span class="n">kstest</span><span class="p">(</span><span class="n">sale_price</span><span class="p">,</span> <span class="n">lognorm</span><span class="o">.</span><span class="n">cdf</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>KstestResult(statistic=1.0, pvalue=0.0)
+</code></pre></div></div>
+
+<p>This test conclusively rejects the null hypothesis that the distribution of <code class="highlighter-rouge">SalePrice</code> is lognormal. Nevertheless, the plots indicate that log-normality is perhaps a usefull approximation. Moreover, <code class="highlighter-rouge">log(SalePrice)</code> may be more useful than <code class="highlighter-rouge">SalePrice</code> for prediction purposes, given the symmetry of its distribution.</p>
+
+<h2 id="categorical-variables">Categorical variables</h2>
+
+<p>First we look at all categorical variables, that is, all discrete variables with no ordering on the values. In our cleaned dataframe these are all the columns with <code class="highlighter-rouge">category</code> dtype</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># dataframe of categorical variables</span>
+<span class="n">cats</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="s">'category'</span><span class="p">))</span>
+<span class="n">cats</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>MSSubClass</th>
+      <th>MSZoning</th>
+      <th>Street</th>
+      <th>LandContour</th>
+      <th>LotConfig</th>
+      <th>Neighborhood</th>
+      <th>Condition1</th>
+      <th>Condition2</th>
+      <th>BldgType</th>
+      <th>HouseStyle</th>
+      <th>...</th>
+      <th>Exterior1st</th>
+      <th>Exterior2nd</th>
+      <th>MasVnrType</th>
+      <th>Foundation</th>
+      <th>Heating</th>
+      <th>CentralAir</th>
+      <th>Electrical</th>
+      <th>GarageType</th>
+      <th>SaleType</th>
+      <th>SaleCondition</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5" valign="top">train</td>
+      <td>1</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>Pave</td>
+      <td>Lvl</td>
+      <td>Inside</td>
+      <td>CollgCr</td>
+      <td>Norm</td>
+      <td>Norm</td>
+      <td>1Fam</td>
+      <td>2Story</td>
+      <td>...</td>
+      <td>VinylSd</td>
+      <td>VinylSd</td>
+      <td>BrkFace</td>
+      <td>PConc</td>
+      <td>GasA</td>
+      <td>Y</td>
+      <td>SBrkr</td>
+      <td>Attchd</td>
+      <td>WD</td>
+      <td>Normal</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>20</td>
+      <td>RL</td>
+      <td>Pave</td>
+      <td>Lvl</td>
+      <td>FR2</td>
+      <td>Veenker</td>
+      <td>Feedr</td>
+      <td>Norm</td>
+      <td>1Fam</td>
+      <td>1Story</td>
+      <td>...</td>
+      <td>MetalSd</td>
+      <td>MetalSd</td>
+      <td>None</td>
+      <td>CBlock</td>
+      <td>GasA</td>
+      <td>Y</td>
+      <td>SBrkr</td>
+      <td>Attchd</td>
+      <td>WD</td>
+      <td>Normal</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>Pave</td>
+      <td>Lvl</td>
+      <td>Inside</td>
+      <td>CollgCr</td>
+      <td>Norm</td>
+      <td>Norm</td>
+      <td>1Fam</td>
+      <td>2Story</td>
+      <td>...</td>
+      <td>VinylSd</td>
+      <td>VinylSd</td>
+      <td>BrkFace</td>
+      <td>PConc</td>
+      <td>GasA</td>
+      <td>Y</td>
+      <td>SBrkr</td>
+      <td>Attchd</td>
+      <td>WD</td>
+      <td>Normal</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>70</td>
+      <td>RL</td>
+      <td>Pave</td>
+      <td>Lvl</td>
+      <td>Corner</td>
+      <td>Crawfor</td>
+      <td>Norm</td>
+      <td>Norm</td>
+      <td>1Fam</td>
+      <td>2Story</td>
+      <td>...</td>
+      <td>Wd Sdng</td>
+      <td>Wd Shng</td>
+      <td>None</td>
+      <td>BrkTil</td>
+      <td>GasA</td>
+      <td>Y</td>
+      <td>SBrkr</td>
+      <td>Detchd</td>
+      <td>WD</td>
+      <td>Abnorml</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>60</td>
+      <td>RL</td>
+      <td>Pave</td>
+      <td>Lvl</td>
+      <td>FR2</td>
+      <td>NoRidge</td>
+      <td>Norm</td>
+      <td>Norm</td>
+      <td>1Fam</td>
+      <td>2Story</td>
+      <td>...</td>
+      <td>VinylSd</td>
+      <td>VinylSd</td>
+      <td>BrkFace</td>
+      <td>PConc</td>
+      <td>GasA</td>
+      <td>Y</td>
+      <td>SBrkr</td>
+      <td>Attchd</td>
+      <td>WD</td>
+      <td>Normal</td>
+    </tr>
+  </tbody>
+</table>
+  <p>5 rows × 22 columns</p>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># print description of categorical variables</span>
+<span class="n">desc</span> <span class="o">=</span> <span class="n">DataDescription</span><span class="p">(</span><span class="s">'../data/data_description.txt'</span><span class="p">)</span>
+<span class="n">cats</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span>
+<span class="n">cats</span><span class="o">.</span><span class="n">print_desc</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="n">cats</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MSSubClass: Identifies the type of dwelling involved in the sale.
+
+	 20 - 1-STORY 1946 &amp; NEWER ALL STYLES
+	 30 - 1-STORY 1945 &amp; OLDER
+	 40 - 1-STORY W/FINISHED ATTIC ALL AGES
+	 45 - 1-1/2 STORY - UNFINISHED ALL AGES
+	 50 - 1-1/2 STORY FINISHED ALL AGES
+	 60 - 2-STORY 1946 &amp; NEWER
+	 70 - 2-STORY 1945 &amp; OLDER
+	 75 - 2-1/2 STORY ALL AGES
+	 80 - SPLIT OR MULTI-LEVEL
+	 85 - SPLIT FOYER
+	 90 - DUPLEX - ALL STYLES AND AGES
+	 120 - 1-STORY PUD (Planned Unit Development) - 1946 &amp; NEWER
+	 150 - 1-1/2 STORY PUD - ALL AGES
+	 160 - 2-STORY PUD - 1946 &amp; NEWER
+	 180 - PUD - MULTILEVEL - INCL SPLIT LEV/FOYER
+	 190 - 2 FAMILY CONVERSION - ALL STYLES AND AGES
+
+
+MSZoning: Identifies the general zoning classification of the sale.
+
+	 A - Agriculture
+	 C - Commercial
+	 FV - Floating Village Residential
+	 I - Industrial
+	 RH - Residential High Density
+	 RL - Residential Low Density
+	 RP - Residential Low Density Park 
+	 RM - Residential Medium Density
+
+
+Street: Type of road access to property
+
+	 Grvl - Gravel
+	 Pave - Paved
+
+
+LandContour: Flatness of the property
+
+	 Lvl - Near Flat/Level
+	 Bnk - Banked - Quick and significant rise from street grade to building
+	 HLS - Hillside - Significant slope from side to side
+	 Low - Depression
+
+
+LotConfig: Lot configuration
+
+	 Inside - Inside lot
+	 Corner - Corner lot
+	 CulDSac - Cul-de-sac
+	 FR2 - Frontage on 2 sides of property
+	 FR3 - Frontage on 3 sides of property
+
+
+Neighborhood: Physical locations within Ames city limits
+
+	 Blmngtn - Bloomington Heights
+	 Blueste - Bluestem
+	 BrDale - Briardale
+	 BrkSide - Brookside
+	 ClearCr - Clear Creek
+	 CollgCr - College Creek
+	 Crawfor - Crawford
+	 Edwards - Edwards
+	 Gilbert - Gilbert
+	 IDOTRR - Iowa DOT and Rail Road
+	 MeadowV - Meadow Village
+	 Mitchel - Mitchell
+	 Names - North Ames
+	 NoRidge - Northridge
+	 NPkVill - Northpark Villa
+	 NridgHt - Northridge Heights
+	 NWAmes - Northwest Ames
+	 OldTown - Old Town
+	 SWISU - South &amp; West of Iowa State University
+	 Sawyer - Sawyer
+	 SawyerW - Sawyer West
+	 Somerst - Somerset
+	 StoneBr - Stone Brook
+	 Timber - Timberland
+	 Veenker - Veenker
+
+
+Condition1: Proximity to various conditions
+
+	 Artery - Adjacent to arterial street
+	 Feedr - Adjacent to feeder street
+	 Norm - Normal
+	 RRNn - Within 200' of North-South Railroad
+	 RRAn - Adjacent to North-South Railroad
+	 PosN - Near positive off-site feature--park, greenbelt, etc.
+	 PosA - Adjacent to postive off-site feature
+	 RRNe - Within 200' of East-West Railroad
+	 RRAe - Adjacent to East-West Railroad
+
+
+Condition2: Proximity to various conditions (if more than one is present)
+
+	 Artery - Adjacent to arterial street
+	 Feedr - Adjacent to feeder street
+	 Norm - Normal
+	 RRNn - Within 200' of North-South Railroad
+	 RRAn - Adjacent to North-South Railroad
+	 PosN - Near positive off-site feature--park, greenbelt, etc.
+	 PosA - Adjacent to postive off-site feature
+	 RRNe - Within 200' of East-West Railroad
+	 RRAe - Adjacent to East-West Railroad
+
+
+BldgType: Type of dwelling
+
+	 1Fam - Single-family Detached
+	 2FmCon - Two-family Conversion; originally built as one-family dwelling
+	 Duplx - Duplex
+	 TwnhsE - Townhouse End Unit
+	 TwnhsI - Townhouse Inside Unit
+
+
+HouseStyle: Style of dwelling
+
+	 1Story - One story
+	 1.5Fin - One and one-half story: 2nd level finished
+	 1.5Unf - One and one-half story: 2nd level unfinished
+	 2Story - Two story
+	 2.5Fin - Two and one-half story: 2nd level finished
+	 2.5Unf - Two and one-half story: 2nd level unfinished
+	 SFoyer - Split Foyer
+	 SLvl - Split Level
+
+
+RoofStyle: Type of roof
+
+	 Flat - Flat
+	 Gable - Gable
+	 Gambrel - Gabrel (Barn)
+	 Hip - Hip
+	 Mansard - Mansard
+	 Shed - Shed
+
+
+RoofMatl: Roof material
+
+	 ClyTile - Clay or Tile
+	 CompShg - Standard (Composite) Shingle
+	 Membran - Membrane
+	 Metal - Metal
+	 Roll - Roll
+	 Tar&amp;Grv - Gravel &amp; Tar
+	 WdShake - Wood Shakes
+	 WdShngl - Wood Shingles
+
+
+Exterior1st: Exterior covering on house
+
+	 AsbShng - Asbestos Shingles
+	 AsphShn - Asphalt Shingles
+	 BrkComm - Brick Common
+	 BrkFace - Brick Face
+	 CBlock - Cinder Block
+	 CemntBd - Cement Board
+	 HdBoard - Hard Board
+	 ImStucc - Imitation Stucco
+	 MetalSd - Metal Siding
+	 Other - Other
+	 Plywood - Plywood
+	 PreCast - PreCast
+	 Stone - Stone
+	 Stucco - Stucco
+	 VinylSd - Vinyl Siding
+	 Wd - Wood Siding
+	 WdShing - Wood Shingles
+
+
+Exterior2nd: Exterior covering on house (if more than one material)
+
+	 AsbShng - Asbestos Shingles
+	 AsphShn - Asphalt Shingles
+	 BrkComm - Brick Common
+	 BrkFace - Brick Face
+	 CBlock - Cinder Block
+	 CemntBd - Cement Board
+	 HdBoard - Hard Board
+	 ImStucc - Imitation Stucco
+	 MetalSd - Metal Siding
+	 Other - Other
+	 Plywood - Plywood
+	 PreCast - PreCast
+	 Stone - Stone
+	 Stucco - Stucco
+	 VinylSd - Vinyl Siding
+	 Wd - Wood Siding
+	 WdShing - Wood Shingles
+
+
+MasVnrType: Masonry veneer type
+
+	 BrkCmn - Brick Common
+	 BrkFace - Brick Face
+	 CBlock - Cinder Block
+	 None - None
+	 Stone - Stone
+
+
+Foundation: Type of foundation
+
+	 BrkTil - Brick &amp; Tile
+	 CBlock - Cinder Block
+	 PConc - Poured Contrete
+	 Slab - Slab
+	 Stone - Stone
+	 Wood - Wood
+
+
+Heating: Type of heating
+
+	 Floor - Floor Furnace
+	 GasA - Gas forced warm air furnace
+	 GasW - Gas hot water or steam heat
+	 Grav - Gravity furnace
+	 OthW - Hot water or steam heat other than gas
+	 Wall - Wall furnace
+
+
+CentralAir: Central air conditioning
+
+	 N - No
+	 Y - Yes
+
+
+Electrical: Electrical system
+
+	 SBrkr - Standard Circuit Breakers &amp; Romex
+	 FuseA - Fuse Box over 60 AMP and all Romex wiring (Average)
+	 FuseF - 60 AMP Fuse Box and mostly Romex wiring (Fair)
+	 FuseP - 60 AMP Fuse Box and mostly knob &amp; tube wiring (poor)
+	 Mix - Mixed
+
+
+GarageType: Garage location
+
+	 2Types - More than one type of garage
+	 Attchd - Attached to home
+	 Basment - Basement Garage
+	 BuiltIn - Built-In (Garage part of house - typically has room above garage)
+	 CarPort - Car Port
+	 Detchd - Detached from home
+	 NA - No Garage
+
+
+SaleType: Type of sale
+
+	 WD - Warranty Deed - Conventional
+	 CWD - Warranty Deed - Cash
+	 VWD - Warranty Deed - VA Loan
+	 New - Home just constructed and sold
+	 COD - Court Officer Deed/Estate
+	 Con - Contract 15% Down payment regular terms
+	 ConLw - Contract Low Down payment and low interest
+	 ConLI - Contract Low Interest
+	 ConLD - Contract Low Down
+	 Oth - Other
+
+
+SaleCondition: Condition of sale
+
+	 Normal - Normal Sale
+	 Abnorml - Abnormal Sale -  trade, foreclosure, short sale
+	 AdjLand - Adjoining Land Purchase
+	 Alloca - Allocation - two linked properties with separate deeds, typically condo with a garage unit
+	 Family - Sale between family members
+	 Partial - Home was not completed when last assessed (associated with New Homes)
+</code></pre></div></div>
+
+<h3 id="distributions">Distributions</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot distributions of categorical variables</span>
+<span class="n">plot_discrete_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">cats</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_31_0.png" alt="png" /></p>
+
+<p>Some of these variables have highly unbalanced distributions. We’ll look for the most extremely unbalanced</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># print distributions of categorical variables with more 90% concentration at single value</span>
+<span class="n">unbal_cat_cols</span> <span class="o">=</span> <span class="n">print_unbal_dists</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cats</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">bal_threshold</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Pave    0.995885
+Grvl    0.004115
+Name: Street, dtype: float64
+
+Norm      0.990055
+Feedr     0.004458
+Artery    0.001715
+PosA      0.001372
+PosN      0.001029
+RRNn      0.000686
+RRAn      0.000343
+RRAe      0.000343
+Name: Condition2, dtype: float64
+
+CompShg    0.985940
+Tar&amp;Grv    0.007545
+WdShake    0.003086
+WdShngl    0.002401
+Roll       0.000343
+Metal      0.000343
+Membran    0.000343
+Name: RoofMatl, dtype: float64
+
+GasA     0.984568
+GasW     0.009259
+Grav     0.003086
+Wall     0.002058
+OthW     0.000686
+Floor    0.000343
+Name: Heating, dtype: float64
+
+Y    0.932785
+N    0.067215
+Name: CentralAir, dtype: float64
+
+SBrkr    0.915295
+FuseA    0.064472
+FuseF    0.017147
+FuseP    0.002743
+Mix      0.000343
+Name: Electrical, dtype: float64
+</code></pre></div></div>
+
+<h3 id="relationships-among-categorical-variables">Relationships among categorical variables</h3>
+
+<p>One often speaks loosely of “correlation” among variables to refer to statistical dependence. There are various measures of dependence, but here we rely on an information theoretic measure known as the <a href="https://en.wikipedia.org/wiki/Variation_of_information">variation of information</a>. We discuss this measure briefly</p>
+
+<p>The function</p>
+
+<script type="math/tex; mode=display">d(X, Y) = H(X, Y) - I(X, Y)</script>
+
+<p>where $H(X, Y)$ is the joint entropy and $I(X, Y)$ the mutual information, <a href="https://arxiv.org/pdf/q-bio/0311039.pdf">defines a metric</a> on the set of random variables. Note that</p>
+
+<script type="math/tex; mode=display">d(X, Y) = H(X|Y) + H(Y|X)</script>
+
+<p>which is sometimes called the “variation of information”. One can normalize to get a standardized variation of information</p>
+
+<script type="math/tex; mode=display">D(X, Y) = \frac{d(X, Y)}{H(X, Y)} = 1 - \frac{I(X, Y)}{H(X, Y)}</script>
+
+<p>i.e. $D(X, Y) \in [0, 1]$. Since $D$ is a metric, $D(X, Y) = 0$ iff $X = Y$ Furthermore, $D(X, Y) = 1$ if and only if $I(X, Y) = 0$ if and only if $X, Y$ are independendent. So we can take $D(X, Y)$ as a “dependence distance”. The closer a variable $Y$ is to $X$, the more it depends on $X$.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Get dataframe of dependence distances of categorical variables</span>
+<span class="n">cats_data_num</span> <span class="o">=</span> <span class="n">num_enc</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cats</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+<span class="n">cats_D_dep_df</span> <span class="o">=</span> <span class="n">D_dep</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">cats_data_num</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot all dependence distances</span>
+<span class="n">plot_D_dep</span><span class="p">(</span><span class="n">cats_D_dep_df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_38_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot dependence distances less than 0.8</span>
+<span class="n">plot_low_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">cats_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_39_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank categorical variables by dependence distance</span>
+<span class="n">rank_pairs_by_D</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">cats_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var1</th>
+      <th>var2</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Exterior1st</td>
+      <td>Exterior2nd</td>
+      <td>0.322737</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>MSSubClass</td>
+      <td>HouseStyle</td>
+      <td>0.472661</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>SaleType</td>
+      <td>SaleCondition</td>
+      <td>0.667950</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>MSSubClass</td>
+      <td>BldgType</td>
+      <td>0.714236</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Notable pairs of distinct variables with low information distance are</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Exterior1st</code> and <code class="highlighter-rouge">Exterior2nd</code> have the lowest dependence distance ($D \approx 0.322$). Their distributions are very similar and they have the same values. It probably makes more sense to think of them as close to identically distributed.</li>
+  <li><code class="highlighter-rouge">MSSubclass</code> and <code class="highlighter-rouge">HouseStyle</code> have the next lowest ($D \approx 0.47$). Inspecting their descriptions above we see that they have very similar categories, so they are measuring very similar things. <code class="highlighter-rouge">BldgType</code> and <code class="highlighter-rouge">MSSubclass</code> ($D \approx 0.71$) are similar.</li>
+  <li><code class="highlighter-rouge">MSSubclass</code> and <code class="highlighter-rouge">Neighborhood</code> ($D \approx 0.84$) are perhaps the first interesting pair in that they are measuring different things. We can imagine that the association between these two variables is strong – it makes sense that the size/age/type of house would be associated to the neighborhood. Similarly, <code class="highlighter-rouge">Exterior1st</code>, <code class="highlighter-rouge">Exterior2nd</code>, <code class="highlighter-rouge">MSZoning</code>, <code class="highlighter-rouge">Foundation</code> also have strong associations with <code class="highlighter-rouge">Neighborhood</code>.</li>
+  <li><code class="highlighter-rouge">SaleCondition</code> and <code class="highlighter-rouge">SaleType</code> ($D \approx 0.67$) are also unsurprisingly associated.</li>
+</ul>
+
+<h3 id="relationships-between-categoricals-and-saleprice">Relationships between categoricals and <code class="highlighter-rouge">SalePrice</code></h3>
+
+<p>Given that <code class="highlighter-rouge">SalePrice</code> seemed to be <a href="#Testing-log-normality">well-approximated</a> by a log-normal distribution, we’ll measure dependence with <code class="highlighter-rouge">log_SalePrice</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cats_data_num</span><span class="p">[</span><span class="s">'log_SalePrice'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
+<span class="n">cats_data_num</span><span class="p">[</span><span class="s">'log_SalePrice'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>       Id  
+train  1       12.247694
+       2       12.109011
+       3       12.317167
+       4       11.849398
+       5       12.429216
+                 ...    
+test   2915          NaN
+       2916          NaN
+       2917          NaN
+       2918          NaN
+       2919          NaN
+Name: log_SalePrice, Length: 2916, dtype: float64
+</code></pre></div></div>
+
+<p>To visualize the relationship between the categorical variables and the response, we’ll look at the distributions of <code class="highlighter-rouge">log_SalePrice</code> over the values of the variables.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># violin plots of categorical variables vs. response</span>
+<span class="n">plot_violin_plots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">cats_data_num</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_46_0.png" alt="png" /></p>
+
+<p>Note that horizontal lines for variable values in the violin plots indicate &lt;5 observations having that value</p>
+
+<p>From these plots, it’s difficult to determine with accuracy for which variables the distribution of <code class="highlighter-rouge">log_SalePrice</code> doesn’t seem to vary greatly across values (and hence are of low dependence and thus low predictive value). The dependence distance between the variables and <code class="highlighter-rouge">log_SalePrice</code> will provide additional information.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank categorical variables by dependence distance from response</span>
+<span class="n">D_dep_response</span><span class="p">(</span><span class="n">cats_data_num</span><span class="p">,</span> <span class="s">'log_SalePrice'</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'D'</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Neighborhood</th>
+      <th>MSSubClass</th>
+      <th>Exterior2nd</th>
+      <th>Exterior1st</th>
+      <th>HouseStyle</th>
+      <th>Foundation</th>
+      <th>GarageType</th>
+      <th>MasVnrType</th>
+      <th>SaleCondition</th>
+      <th>LotConfig</th>
+      <th>...</th>
+      <th>Condition1</th>
+      <th>BldgType</th>
+      <th>RoofStyle</th>
+      <th>LandContour</th>
+      <th>Electrical</th>
+      <th>CentralAir</th>
+      <th>Heating</th>
+      <th>RoofMatl</th>
+      <th>Condition2</th>
+      <th>Street</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>D</td>
+      <td>0.713181</td>
+      <td>0.813289</td>
+      <td>0.831957</td>
+      <td>0.838796</td>
+      <td>0.894477</td>
+      <td>0.901514</td>
+      <td>0.919312</td>
+      <td>0.924422</td>
+      <td>0.926004</td>
+      <td>0.929782</td>
+      <td>...</td>
+      <td>0.937908</td>
+      <td>0.938181</td>
+      <td>0.947682</td>
+      <td>0.956498</td>
+      <td>0.966163</td>
+      <td>0.973683</td>
+      <td>0.990074</td>
+      <td>0.990213</td>
+      <td>0.991566</td>
+      <td>0.996507</td>
+    </tr>
+  </tbody>
+</table>
+  <p>1 rows × 22 columns</p>
+</div>
+
+<p>The lower the dependence distance here, the better assocation with the response, hence the better potential predictive value.</p>
+
+<p>In particular, given how unbalanced their distributions are, it’s perhaps not too surprising to see <code class="highlighter-rouge">RoofStyle</code>, <code class="highlighter-rouge">LandContour</code>, <code class="highlighter-rouge">Electrical</code> and <code class="highlighter-rouge">CentralAir</code> all have such high dependence distance,</p>
+
+<h2 id="ordinal-variables">Ordinal variables</h2>
+
+<p>Now we’ll investigate ordinal variables, that is discrete variables with an ordering. In our cleaned dataframe these are variables with <code class="highlighter-rouge">int64</code> dtype</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># dataframe of ordinal variables</span>
+<span class="n">ords</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="s">'int64'</span><span class="p">))</span>
+<span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>LotShape</th>
+      <th>Utilities</th>
+      <th>LandSlope</th>
+      <th>OverallQual</th>
+      <th>OverallCond</th>
+      <th>ExterQual</th>
+      <th>ExterCond</th>
+      <th>BsmtQual</th>
+      <th>BsmtCond</th>
+      <th>BsmtExposure</th>
+      <th>...</th>
+      <th>FireplaceQu</th>
+      <th>GarageFinish</th>
+      <th>GarageCars</th>
+      <th>GarageQual</th>
+      <th>GarageCond</th>
+      <th>PavedDrive</th>
+      <th>PoolQC</th>
+      <th>Fence</th>
+      <th>MoSold</th>
+      <th>YrSold</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5" valign="top">train</td>
+      <td>1</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>7</td>
+      <td>5</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>1</td>
+      <td>...</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2008</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>0</td>
+      <td>3</td>
+      <td>0</td>
+      <td>6</td>
+      <td>8</td>
+      <td>1</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>4</td>
+      <td>...</td>
+      <td>3</td>
+      <td>2</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>5</td>
+      <td>2007</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>1</td>
+      <td>3</td>
+      <td>0</td>
+      <td>7</td>
+      <td>5</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>2</td>
+      <td>...</td>
+      <td>3</td>
+      <td>2</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>9</td>
+      <td>2008</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>1</td>
+      <td>3</td>
+      <td>0</td>
+      <td>7</td>
+      <td>5</td>
+      <td>1</td>
+      <td>3</td>
+      <td>2</td>
+      <td>4</td>
+      <td>1</td>
+      <td>...</td>
+      <td>4</td>
+      <td>1</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>2006</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>1</td>
+      <td>3</td>
+      <td>0</td>
+      <td>8</td>
+      <td>5</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>...</td>
+      <td>3</td>
+      <td>2</td>
+      <td>3</td>
+      <td>3</td>
+      <td>3</td>
+      <td>2</td>
+      <td>0</td>
+      <td>0</td>
+      <td>12</td>
+      <td>2008</td>
+    </tr>
+  </tbody>
+</table>
+  <p>5 rows × 33 columns</p>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+MultiIndex: 2916 entries, (train, 1) to (test, 2919)
+Data columns (total 33 columns):
+LotShape        2916 non-null int64
+Utilities       2916 non-null int64
+LandSlope       2916 non-null int64
+OverallQual     2916 non-null int64
+OverallCond     2916 non-null int64
+ExterQual       2916 non-null int64
+ExterCond       2916 non-null int64
+BsmtQual        2916 non-null int64
+BsmtCond        2916 non-null int64
+BsmtExposure    2916 non-null int64
+BsmtFinType1    2916 non-null int64
+BsmtFinType2    2916 non-null int64
+HeatingQC       2916 non-null int64
+BsmtFullBath    2916 non-null int64
+BsmtHalfBath    2916 non-null int64
+FullBath        2916 non-null int64
+HalfBath        2916 non-null int64
+BedroomAbvGr    2916 non-null int64
+KitchenAbvGr    2916 non-null int64
+KitchenQual     2916 non-null int64
+TotRmsAbvGrd    2916 non-null int64
+Functional      2916 non-null int64
+Fireplaces      2916 non-null int64
+FireplaceQu     2916 non-null int64
+GarageFinish    2916 non-null int64
+GarageCars      2916 non-null int64
+GarageQual      2916 non-null int64
+GarageCond      2916 non-null int64
+PavedDrive      2916 non-null int64
+PoolQC          2916 non-null int64
+Fence           2916 non-null int64
+MoSold          2916 non-null int64
+YrSold          2916 non-null int64
+dtypes: int64(33)
+memory usage: 783.3+ KB
+</code></pre></div></div>
+
+<p>We’ll print the description of all variables, however note that the print description contains the original value for the variables, while the cleaned dataframe <code class="highlighter-rouge">clean</code> contains the <a href="preprocess.ipynb/#Encode-variables">numerically encoded values</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># print description of ordinal variables</span>
+<span class="n">ords</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span>
+<span class="n">ords</span><span class="o">.</span><span class="n">print_desc</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotShape: General shape of property
+
+	 Reg - Regular
+	 IR1 - Slightly irregular
+	 IR2 - Moderately Irregular
+	 IR3 - Irregular
+
+
+Utilities: Type of utilities available
+
+	 AllPub - All public Utilities (E,G,W,&amp; S)
+	 NoSewr - Electricity, Gas, and Water (Septic Tank)
+	 NoSeWa - Electricity and Gas Only
+	 ELO - Electricity only
+
+
+LandSlope: Slope of property
+
+	 Gtl - Gentle slope
+	 Mod - Moderate Slope
+	 Sev - Severe Slope
+
+
+OverallQual: Rates the overall material and finish of the house
+
+	 10 - Very Excellent
+	 9 - Excellent
+	 8 - Very Good
+	 7 - Good
+	 6 - Above Average
+	 5 - Average
+	 4 - Below Average
+	 3 - Fair
+	 2 - Poor
+	 1 - Very Poor
+
+
+OverallCond: Rates the overall condition of the house
+
+	 10 - Very Excellent
+	 9 - Excellent
+	 8 - Very Good
+	 7 - Good
+	 6 - Above Average
+	 5 - Average
+	 4 - Below Average
+	 3 - Fair
+	 2 - Poor
+	 1 - Very Poor
+
+
+ExterQual: Evaluates the quality of the material on the exterior 
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Average/Typical
+	 Fa - Fair
+	 Po - Poor
+
+
+ExterCond: Evaluates the present condition of the material on the exterior
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Average/Typical
+	 Fa - Fair
+	 Po - Poor
+
+
+BsmtQual: Evaluates the height of the basement
+
+	 Ex - Excellent (100+ inches)
+	 Gd - Good (90-99 inches)
+	 TA - Typical (80-89 inches)
+	 Fa - Fair (70-79 inches)
+	 Po - Poor (&lt;70 inches
+	 NA - No Basement
+
+
+BsmtCond: Evaluates the general condition of the basement
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Typical - slight dampness allowed
+	 Fa - Fair - dampness or some cracking or settling
+	 Po - Poor - Severe cracking, settling, or wetness
+	 NA - No Basement
+
+
+BsmtExposure: Refers to walkout or garden level walls
+
+	 Gd - Good Exposure
+	 Av - Average Exposure (split levels or foyers typically score average or above)
+	 Mn - Mimimum Exposure
+	 No - No Exposure
+	 NA - No Basement
+
+
+BsmtFinType1: Rating of basement finished area
+
+	 GLQ - Good Living Quarters
+	 ALQ - Average Living Quarters
+	 BLQ - Below Average Living Quarters
+	 Rec - Average Rec Room
+	 LwQ - Low Quality
+	 Unf - Unfinshed
+	 NA - No Basement
+
+
+BsmtFinType2: Rating of basement finished area (if multiple types)
+
+	 GLQ - Good Living Quarters
+	 ALQ - Average Living Quarters
+	 BLQ - Below Average Living Quarters
+	 Rec - Average Rec Room
+	 LwQ - Low Quality
+	 Unf - Unfinshed
+	 NA - No Basement
+
+
+HeatingQC: Heating quality and condition
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Average/Typical
+	 Fa - Fair
+	 Po - Poor
+
+
+BsmtFullBath: Basement full bathrooms
+
+
+
+BsmtHalfBath: Basement half bathrooms
+
+
+
+FullBath: Full bathrooms above grade
+
+
+
+HalfBath: Half baths above grade
+
+
+
+BedroomAbvGr: Bedrooms above grade (does NOT include basement bedrooms)
+
+
+
+KitchenAbvGr: Kitchens above grade
+
+
+
+KitchenQual: Kitchen quality
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Typical/Average
+	 Fa - Fair
+	 Po - Poor
+
+
+TotRmsAbvGrd: Total rooms above grade (does not include bathrooms)
+
+
+
+Functional: Home functionality (Assume typical unless deductions are warranted)
+
+	 Typ - Typical Functionality
+	 Min1 - Minor Deductions 1
+	 Min2 - Minor Deductions 2
+	 Mod - Moderate Deductions
+	 Maj1 - Major Deductions 1
+	 Maj2 - Major Deductions 2
+	 Sev - Severely Damaged
+	 Sal - Salvage only
+
+
+Fireplaces: Number of fireplaces
+
+
+
+FireplaceQu: Fireplace quality
+
+	 Ex - Excellent - Exceptional Masonry Fireplace
+	 Gd - Good - Masonry Fireplace in main level
+	 TA - Average - Prefabricated Fireplace in main living area or Masonry Fireplace in basement
+	 Fa - Fair - Prefabricated Fireplace in basement
+	 Po - Poor - Ben Franklin Stove
+	 NA - No Fireplace
+
+
+GarageFinish: Interior finish of the garage
+
+	 Fin - Finished
+	 RFn - Rough Finished
+	 Unf - Unfinished
+	 NA - No Garage
+
+
+GarageCars: Size of garage in car capacity
+
+
+
+GarageQual: Garage quality
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Typical/Average
+	 Fa - Fair
+	 Po - Poor
+	 NA - No Garage
+
+
+GarageCond: Garage condition
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Typical/Average
+	 Fa - Fair
+	 Po - Poor
+	 NA - No Garage
+
+
+PavedDrive: Paved driveway
+
+	 Y - Paved 
+	 P - Partial Pavement
+	 N - Dirt/Gravel
+
+
+PoolQC: Pool quality
+
+	 Ex - Excellent
+	 Gd - Good
+	 TA - Average/Typical
+	 Fa - Fair
+	 NA - No Pool
+
+
+Fence: Fence quality
+
+	 GdPrv - Good Privacy
+	 MnPrv - Minimum Privacy
+	 GdWo - Good Wood
+	 MnWw - Minimum Wood/Wire
+	 NA - No Fence
+
+
+MoSold: Month Sold (MM)
+
+
+
+YrSold: Year Sold (YYYY)
+</code></pre></div></div>
+
+<h3 id="distributions-1">Distributions</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot distributions of ordinal variables</span>
+<span class="n">plot_discrete_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_58_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># look at most unbalanced distributions</span>
+<span class="n">unbal_ord_cols</span> <span class="o">=</span> <span class="n">print_unbal_dists</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">bal_threshold</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>3    0.999657
+1    0.000343
+Name: Utilities, dtype: float64
+
+0    0.951989
+1    0.042524
+2    0.005487
+Name: LandSlope, dtype: float64
+
+0    0.939986
+1    0.058642
+2    0.001372
+Name: BsmtHalfBath, dtype: float64
+
+1    0.954047
+2    0.044239
+0    0.001029
+3    0.000686
+Name: KitchenAbvGr, dtype: float64
+
+6    0.931756
+3    0.024005
+5    0.021948
+2    0.012003
+4    0.006516
+1    0.003086
+0    0.000686
+Name: Functional, dtype: float64
+
+3    0.909122
+0    0.054527
+2    0.025377
+4    0.005144
+1    0.004801
+5    0.001029
+Name: GarageCond, dtype: float64
+
+2    0.904664
+0    0.074074
+1    0.021262
+Name: PavedDrive, dtype: float64
+
+0    0.996914
+4    0.001372
+3    0.001029
+1    0.000686
+Name: PoolQC, dtype: float64
+</code></pre></div></div>
+
+<h3 id="relationships-among-ordinal-variables">Relationships among ordinal variables</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># get dataframe of dependence distances of ordinal variables</span>
+<span class="n">ords_D_dep_df</span> <span class="o">=</span> <span class="n">D_dep</span><span class="p">(</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot all dependence distances</span>
+<span class="n">plot_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">ords_D_dep_df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_62_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot lower dependence distances of ordinal variables</span>
+<span class="n">plot_low_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">ords_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_63_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank ordinals by low dependence distance</span>
+<span class="n">rank_pairs_by_D</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">ords_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var1</th>
+      <th>var2</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>Fireplaces</td>
+      <td>FireplaceQu</td>
+      <td>0.528211</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>GarageQual</td>
+      <td>GarageCond</td>
+      <td>0.542600</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>ExterQual</td>
+      <td>KitchenQual</td>
+      <td>0.760176</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Notable pairs of distinct ordinal variables with low information distance are</p>
+
+<ul>
+  <li><code class="highlighter-rouge">Fireplaces</code> and <code class="highlighter-rouge">FireplaceQu</code> have the lowest dependence distance ($D \approx 0.53$). This is somewhat interesting, in that the quantities these variables are measuring are distinct (albeit related).</li>
+  <li><code class="highlighter-rouge">GarageQual</code> and <code class="highlighter-rouge">GarageCond</code> have the next lowest ($D \approx 0.54$). Inspecting their descriptions above we see that they have very similar categories, so they are measuring very similar things. There is ostensibly a distinction between the quality of the garage and its condition, however.</li>
+  <li>Pairs of garage variables display relatively low dependence distance, as do pairs of basement variables and quality variables.</li>
+</ul>
+
+<h3 id="relationships-between-ordinals-and-saleprice">Relationships between ordinals and <code class="highlighter-rouge">SalePrice</code></h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># add log_SalePrice to ordinal dataframe</span>
+<span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">'log_SalePrice'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
+<span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">'log_SalePrice'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>       Id  
+train  1       12.247694
+       2       12.109011
+       3       12.317167
+       4       11.849398
+       5       12.429216
+                 ...    
+test   2915          NaN
+       2916          NaN
+       2917          NaN
+       2918          NaN
+       2919          NaN
+Name: log_SalePrice, Length: 2916, dtype: float64
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># violin plots of ordinals</span>
+<span class="n">plot_violin_plots</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_68_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot dependence distance with log_SalePrice</span>
+<span class="n">D_dep_response</span><span class="p">(</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s">'log_SalePrice'</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'D'</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>MoSold</th>
+      <th>OverallQual</th>
+      <th>TotRmsAbvGrd</th>
+      <th>BsmtFinType1</th>
+      <th>YrSold</th>
+      <th>GarageCars</th>
+      <th>BsmtQual</th>
+      <th>GarageFinish</th>
+      <th>FireplaceQu</th>
+      <th>OverallCond</th>
+      <th>...</th>
+      <th>GarageQual</th>
+      <th>ExterCond</th>
+      <th>GarageCond</th>
+      <th>PavedDrive</th>
+      <th>Functional</th>
+      <th>BsmtHalfBath</th>
+      <th>LandSlope</th>
+      <th>KitchenAbvGr</th>
+      <th>PoolQC</th>
+      <th>Utilities</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>D</td>
+      <td>0.795577</td>
+      <td>0.821511</td>
+      <td>0.83499</td>
+      <td>0.859118</td>
+      <td>0.877148</td>
+      <td>0.879704</td>
+      <td>0.879858</td>
+      <td>0.886311</td>
+      <td>0.886812</td>
+      <td>0.890191</td>
+      <td>...</td>
+      <td>0.951855</td>
+      <td>0.957094</td>
+      <td>0.959353</td>
+      <td>0.962894</td>
+      <td>0.965643</td>
+      <td>0.978447</td>
+      <td>0.979514</td>
+      <td>0.981345</td>
+      <td>0.997317</td>
+      <td>0.999801</td>
+    </tr>
+  </tbody>
+</table>
+  <p>1 rows × 33 columns</p>
+</div>
+
+<p>Again variables with unbalanced distributions (e.g. <code class="highlighter-rouge">PoolQc</code>, <code class="highlighter-rouge">Utilities</code>) tend to have high information distance, as do variables for which the distribution of <code class="highlighter-rouge">log_SalePrice</code> doesn’t differ much across their classes (e.g. <code class="highlighter-rouge">BsmtHalfBath</code>, <code class="highlighter-rouge">PavedDrive</code>, <code class="highlighter-rouge">LandSlope</code>).</p>
+
+<p>That <code class="highlighter-rouge">OverallQual</code> has high dependence isn’t surprising, but perhaps <code class="highlighter-rouge">MoSold</code> having the lowest is.</p>
+
+<h4 id="rank-correlation-hypothesis-tests">Rank correlation hypothesis tests</h4>
+
+<p>One way of testing statistical dependence between ordered varialbes is using <a href="https://en.wikipedia.org/wiki/Rank_correlation">rank correlations</a>. Since they’re relatively straightforward to calculate, we calculate three common ones and compare. We’ll look at <a href="https://en.wikipedia.org/wiki/Pearson_correlation_coefficient">Pearson’s $\rho$</a>, <a href="https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient">Spearman’s $r_s$</a>, and <a href="https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient">Kendall’s $\tau$</a></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank correlation results as dataframes</span>
+<span class="n">rho_df</span> <span class="o">=</span> <span class="n">rank_hyp_test</span><span class="p">(</span><span class="n">ords</span><span class="p">,</span> <span class="s">'rho'</span><span class="p">,</span> <span class="n">ss</span><span class="o">.</span><span class="n">pearsonr</span><span class="p">)</span>
+<span class="n">r_s_df</span> <span class="o">=</span> <span class="n">rank_hyp_test</span><span class="p">(</span><span class="n">ords</span><span class="p">,</span> <span class="s">'r_s'</span><span class="p">,</span> <span class="n">ss</span><span class="o">.</span><span class="n">spearmanr</span><span class="p">)</span>
+<span class="n">tau_df</span> <span class="o">=</span> <span class="n">rank_hyp_test</span><span class="p">(</span><span class="n">ords</span><span class="p">,</span> <span class="s">'tau'</span><span class="p">,</span> <span class="n">ss</span><span class="o">.</span><span class="n">kendalltau</span><span class="p">)</span>
+<span class="n">rank_hyp_test_dfs</span> <span class="o">=</span> <span class="p">{</span><span class="s">'rho'</span><span class="p">:</span> <span class="n">rho_df</span><span class="p">,</span> <span class="s">'r_s'</span><span class="p">:</span> <span class="n">r_s_df</span><span class="p">,</span> <span class="s">'tau'</span><span class="p">:</span> <span class="n">tau_df</span><span class="p">}</span>
+
+<span class="c"># rank and sort by p-value of Pearson's rho</span>
+<span class="n">get_rank_corr_df</span><span class="p">(</span><span class="n">rank_hyp_test_dfs</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'rho'</span><span class="p">,</span> <span class="s">'r_s'</span><span class="p">,</span> <span class="s">'tau'</span><span class="p">])</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'rho_p_val_rank'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>rho_p_val</th>
+      <th>rho_p_val_rank</th>
+      <th>r_s_p_val</th>
+      <th>r_s_p_val_rank</th>
+      <th>tau_p_val</th>
+      <th>tau_p_val_rank</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>OverallQual</td>
+      <td>0.000000e+00</td>
+      <td>1</td>
+      <td>0.000000e+00</td>
+      <td>1</td>
+      <td>5.929359e-270</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <td>ExterQual</td>
+      <td>7.761033e-201</td>
+      <td>2</td>
+      <td>2.040959e-203</td>
+      <td>3</td>
+      <td>1.272156e-159</td>
+      <td>4</td>
+    </tr>
+    <tr>
+      <td>GarageCars</td>
+      <td>3.307683e-199</td>
+      <td>3</td>
+      <td>2.382463e-207</td>
+      <td>2</td>
+      <td>6.327182e-176</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <td>KitchenQual</td>
+      <td>2.324509e-190</td>
+      <td>4</td>
+      <td>3.122308e-193</td>
+      <td>5</td>
+      <td>1.456887e-158</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>BsmtQual</td>
+      <td>5.427313e-175</td>
+      <td>5</td>
+      <td>2.488211e-197</td>
+      <td>4</td>
+      <td>1.250445e-164</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <td>GarageFinish</td>
+      <td>2.620057e-146</td>
+      <td>6</td>
+      <td>9.382754e-165</td>
+      <td>7</td>
+      <td>2.217914e-140</td>
+      <td>6</td>
+    </tr>
+    <tr>
+      <td>FullBath</td>
+      <td>1.759447e-141</td>
+      <td>7</td>
+      <td>3.253667e-167</td>
+      <td>6</td>
+      <td>1.117470e-133</td>
+      <td>7</td>
+    </tr>
+    <tr>
+      <td>FireplaceQu</td>
+      <td>3.528296e-114</td>
+      <td>8</td>
+      <td>7.777438e-110</td>
+      <td>8</td>
+      <td>1.384314e-99</td>
+      <td>9</td>
+    </tr>
+    <tr>
+      <td>TotRmsAbvGrd</td>
+      <td>3.524836e-110</td>
+      <td>9</td>
+      <td>4.199477e-108</td>
+      <td>9</td>
+      <td>5.527766e-104</td>
+      <td>8</td>
+    </tr>
+    <tr>
+      <td>Fireplaces</td>
+      <td>2.049485e-89</td>
+      <td>10</td>
+      <td>2.189811e-101</td>
+      <td>10</td>
+      <td>5.443444e-88</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <td>HeatingQC</td>
+      <td>2.503143e-82</td>
+      <td>11</td>
+      <td>2.833473e-89</td>
+      <td>11</td>
+      <td>5.700439e-81</td>
+      <td>11</td>
+    </tr>
+    <tr>
+      <td>GarageQual</td>
+      <td>1.143613e-46</td>
+      <td>12</td>
+      <td>1.501771e-43</td>
+      <td>13</td>
+      <td>2.160589e-41</td>
+      <td>13</td>
+    </tr>
+    <tr>
+      <td>BsmtExposure</td>
+      <td>3.598521e-45</td>
+      <td>13</td>
+      <td>1.337016e-41</td>
+      <td>15</td>
+      <td>1.843618e-40</td>
+      <td>14</td>
+    </tr>
+    <tr>
+      <td>GarageCond</td>
+      <td>5.806508e-45</td>
+      <td>14</td>
+      <td>1.512574e-40</td>
+      <td>16</td>
+      <td>2.197488e-38</td>
+      <td>16</td>
+    </tr>
+    <tr>
+      <td>BsmtFinType1</td>
+      <td>1.544276e-39</td>
+      <td>15</td>
+      <td>2.791158e-46</td>
+      <td>12</td>
+      <td>2.122343e-46</td>
+      <td>12</td>
+    </tr>
+    <tr>
+      <td>HalfBath</td>
+      <td>6.573728e-35</td>
+      <td>16</td>
+      <td>9.576207e-42</td>
+      <td>14</td>
+      <td>3.530858e-39</td>
+      <td>15</td>
+    </tr>
+    <tr>
+      <td>PavedDrive</td>
+      <td>1.174245e-32</td>
+      <td>17</td>
+      <td>9.055822e-28</td>
+      <td>18</td>
+      <td>6.292790e-27</td>
+      <td>18</td>
+    </tr>
+    <tr>
+      <td>LotShape</td>
+      <td>3.682206e-29</td>
+      <td>18</td>
+      <td>3.397766e-36</td>
+      <td>17</td>
+      <td>1.363538e-34</td>
+      <td>17</td>
+    </tr>
+    <tr>
+      <td>BsmtCond</td>
+      <td>1.302478e-26</td>
+      <td>19</td>
+      <td>1.100259e-25</td>
+      <td>19</td>
+      <td>4.811484e-25</td>
+      <td>19</td>
+    </tr>
+    <tr>
+      <td>BsmtFullBath</td>
+      <td>5.765714e-20</td>
+      <td>20</td>
+      <td>4.174597e-18</td>
+      <td>21</td>
+      <td>1.040257e-17</td>
+      <td>21</td>
+    </tr>
+    <tr>
+      <td>BedroomAbvGr</td>
+      <td>5.553622e-16</td>
+      <td>21</td>
+      <td>6.069682e-20</td>
+      <td>20</td>
+      <td>2.027010e-20</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>KitchenAbvGr</td>
+      <td>1.568173e-08</td>
+      <td>22</td>
+      <td>2.543739e-10</td>
+      <td>23</td>
+      <td>3.235206e-10</td>
+      <td>23</td>
+    </tr>
+    <tr>
+      <td>Functional</td>
+      <td>1.437417e-07</td>
+      <td>23</td>
+      <td>9.116464e-08</td>
+      <td>24</td>
+      <td>9.253383e-08</td>
+      <td>24</td>
+    </tr>
+    <tr>
+      <td>Fence</td>
+      <td>2.386137e-05</td>
+      <td>24</td>
+      <td>4.477501e-13</td>
+      <td>22</td>
+      <td>1.551382e-12</td>
+      <td>22</td>
+    </tr>
+    <tr>
+      <td>PoolQC</td>
+      <td>1.030024e-03</td>
+      <td>25</td>
+      <td>1.490013e-02</td>
+      <td>27</td>
+      <td>1.492559e-02</td>
+      <td>27</td>
+    </tr>
+    <tr>
+      <td>MoSold</td>
+      <td>2.677357e-02</td>
+      <td>26</td>
+      <td>7.253421e-03</td>
+      <td>26</td>
+      <td>6.503260e-03</td>
+      <td>26</td>
+    </tr>
+    <tr>
+      <td>ExterCond</td>
+      <td>5.869885e-02</td>
+      <td>27</td>
+      <td>6.460164e-01</td>
+      <td>32</td>
+      <td>6.635896e-01</td>
+      <td>33</td>
+    </tr>
+    <tr>
+      <td>YrSold</td>
+      <td>1.550808e-01</td>
+      <td>28</td>
+      <td>2.543787e-01</td>
+      <td>30</td>
+      <td>2.573829e-01</td>
+      <td>30</td>
+    </tr>
+    <tr>
+      <td>OverallCond</td>
+      <td>1.567476e-01</td>
+      <td>29</td>
+      <td>6.717184e-07</td>
+      <td>25</td>
+      <td>1.787177e-07</td>
+      <td>25</td>
+    </tr>
+    <tr>
+      <td>LandSlope</td>
+      <td>1.671482e-01</td>
+      <td>30</td>
+      <td>7.277014e-02</td>
+      <td>28</td>
+      <td>7.323031e-02</td>
+      <td>28</td>
+    </tr>
+    <tr>
+      <td>BsmtFinType2</td>
+      <td>5.861356e-01</td>
+      <td>31</td>
+      <td>1.246273e-01</td>
+      <td>29</td>
+      <td>1.412702e-01</td>
+      <td>29</td>
+    </tr>
+    <tr>
+      <td>Utilities</td>
+      <td>6.304159e-01</td>
+      <td>32</td>
+      <td>5.249597e-01</td>
+      <td>31</td>
+      <td>5.247749e-01</td>
+      <td>31</td>
+    </tr>
+    <tr>
+      <td>BsmtHalfBath</td>
+      <td>8.503143e-01</td>
+      <td>33</td>
+      <td>6.522158e-01</td>
+      <td>33</td>
+      <td>6.520497e-01</td>
+      <td>32</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>There is more or less good agreement of $p$-value rankings among the rank correlation hypothesis tests. In particular for a 95% significance level all three fail to reject the null for <code class="highlighter-rouge">MoSold</code>, <code class="highlighter-rouge">ExterCond</code>, <code class="highlighter-rouge">OverallCond</code>, <code class="highlighter-rouge">LandSlope</code>, <code class="highlighter-rouge">BsmtFinType2</code>, <code class="highlighter-rouge">Utilities</code> and <code class="highlighter-rouge">BsmtHalfBath</code>. Applying a stricter value of 99.9% significance, all three reject <code class="highlighter-rouge">PoolQC</code> as well.</p>
+
+<p>It’s important to recognize that rank correlation tests are measures of monotonicity (the tendency of variables to increase together and decrease together). They may fail to detect non-linear relationships that are not monotonic. In our particular case, <code class="highlighter-rouge">MoSold</code> had the highest statistical dependence with <code class="highlighter-rouge">log_SalePrice</code> among ordinal variables, but all three rank correlation tests reject a relationship between the two at 95\% significance.</p>
+
+<h2 id="quantitative-variables">Quantitative variables</h2>
+
+<p>Finally we’ll consider the quantitative variables, that is the continuous variables. In our cleaned dataframe these are the variables with <code class="highlighter-rouge">float64</code> dtype.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># dataframe of quantitative variables</span>
+<span class="n">quants</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">(</span><span class="s">'float64'</span><span class="p">)</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">]))</span>
+<span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th></th>
+      <th>LotFrontage</th>
+      <th>LotArea</th>
+      <th>YearBuilt</th>
+      <th>YearRemodAdd</th>
+      <th>MasVnrArea</th>
+      <th>BsmtFinSF1</th>
+      <th>BsmtFinSF2</th>
+      <th>BsmtUnfSF</th>
+      <th>TotalBsmtSF</th>
+      <th>1stFlrSF</th>
+      <th>...</th>
+      <th>GrLivArea</th>
+      <th>GarageYrBlt</th>
+      <th>GarageArea</th>
+      <th>WoodDeckSF</th>
+      <th>OpenPorchSF</th>
+      <th>EnclosedPorch</th>
+      <th>3SsnPorch</th>
+      <th>ScreenPorch</th>
+      <th>PoolArea</th>
+      <th>MiscVal</th>
+    </tr>
+    <tr>
+      <th></th>
+      <th>Id</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td rowspan="5" valign="top">train</td>
+      <td>1</td>
+      <td>65.0</td>
+      <td>8450.0</td>
+      <td>2003.0</td>
+      <td>2003.0</td>
+      <td>196.0</td>
+      <td>706.0</td>
+      <td>0.0</td>
+      <td>150.0</td>
+      <td>856.0</td>
+      <td>856.0</td>
+      <td>...</td>
+      <td>1710.0</td>
+      <td>2003.0</td>
+      <td>548.0</td>
+      <td>0.0</td>
+      <td>61.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>80.0</td>
+      <td>9600.0</td>
+      <td>1976.0</td>
+      <td>1976.0</td>
+      <td>0.0</td>
+      <td>978.0</td>
+      <td>0.0</td>
+      <td>284.0</td>
+      <td>1262.0</td>
+      <td>1262.0</td>
+      <td>...</td>
+      <td>1262.0</td>
+      <td>1976.0</td>
+      <td>460.0</td>
+      <td>298.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>68.0</td>
+      <td>11250.0</td>
+      <td>2001.0</td>
+      <td>2002.0</td>
+      <td>162.0</td>
+      <td>486.0</td>
+      <td>0.0</td>
+      <td>434.0</td>
+      <td>920.0</td>
+      <td>920.0</td>
+      <td>...</td>
+      <td>1786.0</td>
+      <td>2001.0</td>
+      <td>608.0</td>
+      <td>0.0</td>
+      <td>42.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>60.0</td>
+      <td>9550.0</td>
+      <td>1915.0</td>
+      <td>1970.0</td>
+      <td>0.0</td>
+      <td>216.0</td>
+      <td>0.0</td>
+      <td>540.0</td>
+      <td>756.0</td>
+      <td>961.0</td>
+      <td>...</td>
+      <td>1717.0</td>
+      <td>1998.0</td>
+      <td>642.0</td>
+      <td>0.0</td>
+      <td>35.0</td>
+      <td>272.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>84.0</td>
+      <td>14260.0</td>
+      <td>2000.0</td>
+      <td>2000.0</td>
+      <td>350.0</td>
+      <td>655.0</td>
+      <td>0.0</td>
+      <td>490.0</td>
+      <td>1145.0</td>
+      <td>1145.0</td>
+      <td>...</td>
+      <td>2198.0</td>
+      <td>2000.0</td>
+      <td>836.0</td>
+      <td>192.0</td>
+      <td>84.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+  <p>5 rows × 22 columns</p>
+</div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+MultiIndex: 2916 entries, (train, 1) to (test, 2919)
+Data columns (total 22 columns):
+LotFrontage      2916 non-null float64
+LotArea          2916 non-null float64
+YearBuilt        2916 non-null float64
+YearRemodAdd     2916 non-null float64
+MasVnrArea       2916 non-null float64
+BsmtFinSF1       2916 non-null float64
+BsmtFinSF2       2916 non-null float64
+BsmtUnfSF        2916 non-null float64
+TotalBsmtSF      2916 non-null float64
+1stFlrSF         2916 non-null float64
+2ndFlrSF         2916 non-null float64
+LowQualFinSF     2916 non-null float64
+GrLivArea        2916 non-null float64
+GarageYrBlt      2916 non-null float64
+GarageArea       2916 non-null float64
+WoodDeckSF       2916 non-null float64
+OpenPorchSF      2916 non-null float64
+EnclosedPorch    2916 non-null float64
+3SsnPorch        2916 non-null float64
+ScreenPorch      2916 non-null float64
+PoolArea         2916 non-null float64
+MiscVal          2916 non-null float64
+dtypes: float64(22)
+memory usage: 532.7+ KB
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># print description of quantitative variables</span>
+<span class="n">quants</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span>
+<span class="n">quants</span><span class="o">.</span><span class="n">print_desc</span><span class="p">(</span><span class="n">cols</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotFrontage: Linear feet of street connected to property
+
+
+
+LotArea: Lot size in square feet
+
+
+
+YearBuilt: Original construction date
+
+
+
+YearRemodAdd: Remodel date (same as construction date if no remodeling or additions)
+
+
+
+MasVnrArea: Masonry veneer area in square feet
+
+
+
+BsmtFinSF1: Type 1 finished square feet
+
+
+
+BsmtFinSF2: Type 2 finished square feet
+
+
+
+BsmtUnfSF: Unfinished square feet of basement area
+
+
+
+TotalBsmtSF: Total square feet of basement area
+
+
+
+1stFlrSF: First Floor square feet
+
+
+
+2ndFlrSF: Second floor square feet
+
+
+
+LowQualFinSF: Low quality finished square feet (all floors)
+
+
+
+GrLivArea: Above grade (ground) living area square feet
+
+
+
+GarageYrBlt: Year garage was built
+
+
+
+GarageArea: Size of garage in square feet
+
+
+
+WoodDeckSF: Wood deck area in square feet
+
+
+
+OpenPorchSF: Open porch area in square feet
+
+
+
+EnclosedPorch: Enclosed porch area in square feet
+
+
+
+3SsnPorch: Three season porch area in square feet
+
+
+
+ScreenPorch: Screen porch area in square feet
+
+
+
+PoolArea: Pool area in square feet
+
+
+
+MiscVal: $Value of miscellaneous feature
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+MultiIndex: 2916 entries, (train, 1) to (test, 2919)
+Data columns (total 22 columns):
+LotFrontage      2916 non-null float64
+LotArea          2916 non-null float64
+YearBuilt        2916 non-null float64
+YearRemodAdd     2916 non-null float64
+MasVnrArea       2916 non-null float64
+BsmtFinSF1       2916 non-null float64
+BsmtFinSF2       2916 non-null float64
+BsmtUnfSF        2916 non-null float64
+TotalBsmtSF      2916 non-null float64
+1stFlrSF         2916 non-null float64
+2ndFlrSF         2916 non-null float64
+LowQualFinSF     2916 non-null float64
+GrLivArea        2916 non-null float64
+GarageYrBlt      2916 non-null float64
+GarageArea       2916 non-null float64
+WoodDeckSF       2916 non-null float64
+OpenPorchSF      2916 non-null float64
+EnclosedPorch    2916 non-null float64
+3SsnPorch        2916 non-null float64
+ScreenPorch      2916 non-null float64
+PoolArea         2916 non-null float64
+MiscVal          2916 non-null float64
+dtypes: float64(22)
+memory usage: 532.7+ KB
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_cont_dists</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""Plot distributions of continuous variables."""</span>
+    <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">series</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">][</span><span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">distplot</span><span class="p">(</span><span class="n">series</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot distributions of quantitative variables</span>
+<span class="n">plot_cont_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_82_0.png" alt="png" /></p>
+
+<p>Most of the variables are highly positively skewed</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">skew</span><span class="p">()</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotFrontage       1.049465
+LotArea          13.269377
+YearBuilt        -0.600024
+YearRemodAdd     -0.449893
+MasVnrArea        2.618990
+BsmtFinSF1        0.982465
+BsmtFinSF2        4.145816
+BsmtUnfSF         0.919998
+TotalBsmtSF       0.677494
+1stFlrSF          1.259407
+2ndFlrSF          0.861482
+LowQualFinSF     12.088646
+GrLivArea         1.069506
+GarageYrBlt      -0.658118
+GarageArea        0.219101
+WoodDeckSF        1.847119
+OpenPorchSF       2.533111
+EnclosedPorch     4.003630
+3SsnPorch        11.375940
+ScreenPorch       3.946335
+PoolArea         17.694707
+MiscVal          21.947201
+dtype: float64
+</code></pre></div></div>
+
+<p>Some of the quantitative variables appear to be multimodal. For quite a few, this is due to a large peak at zero, and for some it’s clear that zero is being used as a stand-in for a null value (for example, <code class="highlighter-rouge">PoolArea</code> = 0 if the house has no pool). We’ll look at which variables have a high peak at zero</p>
+
+<p>We note that many of these variables have long right tails, so logarithmic scales may be more appropriate for these.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot distributions of logarithms of all nonzero values of quantitative variables</span>
+<span class="n">log_cols</span> <span class="o">=</span> <span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s">'YearBuilt'</span><span class="p">,</span> <span class="s">'YearRemodAdd'</span><span class="p">])</span>
+<span class="n">plot_log_cont_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">log_cols</span><span class="o">=</span><span class="n">log_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_87_0.png" alt="png" /></p>
+
+<h3 id="relationships-among-quantitative-variables">Relationships among quantitative variables</h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># scatterplots of quantitative variables</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;seaborn.axisgrid.PairGrid at 0x121036da0&gt;
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_89_1.png" alt="png" /></p>
+
+<p>While pairplots can be helpful, this one is a bit too big to be of much use, although it may inform later methods of detecting relationships.</p>
+
+<p>Some things do stand out:</p>
+
+<ul>
+  <li>
+    <p>There appear to be regions of exclusion for certain pairs of variables, probably due to impossible values. For example, <code class="highlighter-rouge">YrRemodAdd</code> is never greater than <code class="highlighter-rouge">YrBuilt</code>.</p>
+  </li>
+  <li>
+    <p>Many of the distributions are very concentrated. <code class="highlighter-rouge">LotArea</code>, <code class="highlighter-rouge">BsmtFinSF2</code>, <code class="highlighter-rouge">LowQualFinSF</code>, <code class="highlighter-rouge">EnclosedPorch</code>, <code class="highlighter-rouge">3SsnPorch</code> all stand out as extremely concentrated.</p>
+  </li>
+</ul>
+
+<p>Now we’ll look at dependencies among the quantitative variables</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># dataframe of dependence distances of quantitative variables</span>
+<span class="n">quants_D_dep_df</span> <span class="o">=</span> <span class="n">D_dep</span><span class="p">(</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot dependence distance</span>
+<span class="n">plot_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">quants_D_dep_df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_93_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot lower dependence distances of quantitative variables</span>
+<span class="n">plot_low_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">quants_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_94_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># display pairs of quantitatives with low dependence distance</span>
+<span class="n">rank_pairs_by_D</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">quants_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var1</th>
+      <th>var2</th>
+      <th>D</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>1stFlrSF</td>
+      <td>GrLivArea</td>
+      <td>0.158882</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>TotalBsmtSF</td>
+      <td>1stFlrSF</td>
+      <td>0.213738</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>LotArea</td>
+      <td>GrLivArea</td>
+      <td>0.227010</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>TotalBsmtSF</td>
+      <td>GrLivArea</td>
+      <td>0.242833</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>LotArea</td>
+      <td>1stFlrSF</td>
+      <td>0.250292</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>LotArea</td>
+      <td>TotalBsmtSF</td>
+      <td>0.269834</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>LotArea</td>
+      <td>BsmtUnfSF</td>
+      <td>0.273087</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>BsmtUnfSF</td>
+      <td>TotalBsmtSF</td>
+      <td>0.292260</td>
+    </tr>
+    <tr>
+      <td>9</td>
+      <td>BsmtUnfSF</td>
+      <td>GrLivArea</td>
+      <td>0.307987</td>
+    </tr>
+    <tr>
+      <td>10</td>
+      <td>BsmtUnfSF</td>
+      <td>1stFlrSF</td>
+      <td>0.320845</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p>Compared to quantitative and ordinal variables pairs, pairs of quantitative variables are showing much higher dependencies (lower dependence distances) overall. For many of these pairs , the high dependence makes sense given both variables are measuring very similar areas, for example, <code class="highlighter-rouge">1stFlrSF</code>, <code class="highlighter-rouge">GrLivArea</code> and <code class="highlighter-rouge">TotalBsmtSF</code>.</p>
+
+<p>We expect that Pearsons’ $rho$ (i.e. correlation/linear dependence) of these variables should be high as well.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_corr</span><span class="p">(</span><span class="n">quants_data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""Plot (Pearson's) correlation as heatmap."""</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Correlation/Linear Dependence'</span><span class="p">)</span>
+    <span class="n">cmap</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">cm</span><span class="o">.</span><span class="n">rocket_r</span>
+    <span class="n">corr</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">quants_data</span><span class="o">.</span><span class="n">corr</span><span class="p">())</span>
+    <span class="c"># Generate a mask for the upper triangle</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="nb">bool</span><span class="p">)</span>
+    <span class="n">mask</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">triu_indices_from</span><span class="p">(</span><span class="n">mask</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">heatmap</span><span class="p">(</span><span class="n">corr</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mask</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">cmap</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot pearson's correlation for quantitative variables</span>
+<span class="n">plot_corr</span><span class="p">(</span><span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_98_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot high absolute value of correlations of quantiatives</span>
+<span class="n">plot_high_corr</span><span class="p">(</span><span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">abs_corr_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_99_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank pairs of quantitatives by absolute values of correlation</span>
+<span class="n">rank_pairs_by_abs_corr_df</span> <span class="o">=</span> <span class="n">rank_pairs_by_abs_corr</span><span class="p">(</span><span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">abs_corr_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+<span class="n">rank_pairs_by_abs_corr_df</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>var1</th>
+      <th>var2</th>
+      <th>abs_corr</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td>BsmtFinSF1</td>
+      <td>TotalBsmtSF</td>
+      <td>0.511258</td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td>1stFlrSF</td>
+      <td>GrLivArea</td>
+      <td>0.546383</td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td>YearBuilt</td>
+      <td>YearRemodAdd</td>
+      <td>0.612023</td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td>YearRemodAdd</td>
+      <td>GarageYrBlt</td>
+      <td>0.618881</td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td>GarageYrBlt</td>
+      <td>GarageArea</td>
+      <td>0.653440</td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td>2ndFlrSF</td>
+      <td>GrLivArea</td>
+      <td>0.658420</td>
+    </tr>
+    <tr>
+      <td>7</td>
+      <td>TotalBsmtSF</td>
+      <td>1stFlrSF</td>
+      <td>0.793482</td>
+    </tr>
+    <tr>
+      <td>8</td>
+      <td>YearBuilt</td>
+      <td>GarageYrBlt</td>
+      <td>0.808100</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<h3 id="relationships-between-quantitative-variables-and-saleprice">Relationships between quantitative variables and <code class="highlighter-rouge">SalePrice</code></h3>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># add log_SalePrice to quantitatives dataframe</span>
+<span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">'log_SalePrice'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
+<span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="s">'log_SalePrice'</span><span class="p">]</span>
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>       Id  
+train  1       12.247694
+       2       12.109011
+       3       12.317167
+       4       11.849398
+       5       12.429216
+                 ...    
+test   2915          NaN
+       2916          NaN
+       2917          NaN
+       2918          NaN
+       2919          NaN
+Name: log_SalePrice, Length: 2916, dtype: float64
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_joint_dists_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">quants_data</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span>
+                                   <span class="n">figsize</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""Plot joint distributions of quantitatives and response."""</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">quants_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s">'KDE estimate of joint distribution of quantitative'</span> <span class="o">+</span>
+                 <span class="s">'variables and log of SalePrice'</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="n">ncols</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">kdeplot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">quants_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:][</span><span class="n">col</span><span class="p">],</span>
+                    <span class="n">data2</span><span class="o">=</span><span class="n">quants_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:][</span><span class="n">response</span><span class="p">],</span>
+                    <span class="n">shade</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">shade_lowest</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.96</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot joint distributions of quantitative variables and log of sale price</span>
+<span class="n">plot_joint_dists_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_104_0.png" alt="png" /></p>
+
+<p>The distribution of some of the variables appears to be problematic for <code class="highlighter-rouge">seaborn</code> to fit a joint kernel density estimate. We’ll look at scatterplots instead</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_scatter_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">quants_data</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""Plot scatterplots of quantitatives and response."""</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">quants_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s">'Scatterplots of quantitative variables vs. '</span> <span class="o">+</span>
+                 <span class="s">'log of SalePrice'</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="n">ncols</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">quants_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:][</span><span class="n">col</span><span class="p">],</span>
+                        <span class="n">y</span><span class="o">=</span><span class="n">quants_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:][</span><span class="n">response</span><span class="p">],</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">quants_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.96</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">plot_log_scatter_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">quants_data</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="s">"""Plot scatterplots of logs of quantitatives and response."""</span>
+    <span class="n">columns</span> <span class="o">=</span> <span class="n">quants_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">response</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="p">,</span> <span class="n">axes</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="p">,</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">figsize</span><span class="p">)</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s">'Scatterplots of log of quantitative variables vs.'</span>
+                 <span class="o">+</span> <span class="s">' log of SalePrice'</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">col</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+        <span class="n">j</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">i</span> <span class="o">//</span> <span class="n">ncols</span><span class="p">,</span> <span class="n">i</span> <span class="o">%</span> <span class="n">ncols</span>
+        <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">quants_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:][</span><span class="n">col</span><span class="p">]),</span>
+                        <span class="n">y</span><span class="o">=</span><span class="n">quants_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:][</span><span class="n">response</span><span class="p">],</span>
+                        <span class="n">data</span><span class="o">=</span><span class="n">quants_data</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">])</span>
+        <span class="n">axes</span><span class="p">[</span><span class="n">j</span><span class="p">,</span> <span class="n">k</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'log_'</span> <span class="o">+</span> <span class="n">col</span><span class="p">)</span>
+
+    <span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">fig</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mf">0.96</span><span class="p">)</span>
+</code></pre></div></div>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># scatterplots of quantitative variables and log of sale price</span>
+<span class="n">plot_scatter_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_107_0.png" alt="png" /></p>
+
+<p>Now will look at scatterplots of log transformations of the quantitive variables vs. <code class="highlighter-rouge">log_SalePrice</code></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># scatterplots of log of nonzero values of quantitative variables and log of sale price</span>
+<span class="n">plot_log_scatter_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
+</code></pre></div></div>
+
+<p><img src="/temp/assets/images/explore_109_0.png" alt="png" /></p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank dependence distance of quantiatives with log_SalePrice</span>
+<span class="n">D_dep_response</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'D'</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+</code></pre></div></div>
+
+<div>
+  <style scoped="">
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+
+  <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>LotArea</th>
+      <th>GrLivArea</th>
+      <th>1stFlrSF</th>
+      <th>BsmtUnfSF</th>
+      <th>TotalBsmtSF</th>
+      <th>GarageArea</th>
+      <th>BsmtFinSF1</th>
+      <th>YearBuilt</th>
+      <th>GarageYrBlt</th>
+      <th>LotFrontage</th>
+      <th>...</th>
+      <th>YearRemodAdd</th>
+      <th>WoodDeckSF</th>
+      <th>MasVnrArea</th>
+      <th>EnclosedPorch</th>
+      <th>BsmtFinSF2</th>
+      <th>ScreenPorch</th>
+      <th>MiscVal</th>
+      <th>LowQualFinSF</th>
+      <th>3SsnPorch</th>
+      <th>PoolArea</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>D</td>
+      <td>0.166598</td>
+      <td>0.216601</td>
+      <td>0.243486</td>
+      <td>0.259179</td>
+      <td>0.266558</td>
+      <td>0.390699</td>
+      <td>0.41101</td>
+      <td>0.549621</td>
+      <td>0.561122</td>
+      <td>0.579528</td>
+      <td>...</td>
+      <td>0.627967</td>
+      <td>0.632256</td>
+      <td>0.647403</td>
+      <td>0.854684</td>
+      <td>0.875006</td>
+      <td>0.913641</td>
+      <td>0.968622</td>
+      <td>0.985514</td>
+      <td>0.98756</td>
+      <td>0.995242</td>
+    </tr>
+  </tbody>
+</table>
+  <p>1 rows × 22 columns</p>
+</div>
+
+<p>Considering the scatterplots and taking into account the dependence distance $D$, we see that some quantitative variables appear are likely to be less helpful in predicting <code class="highlighter-rouge">SalePrice</code>. Of these, <code class="highlighter-rouge">EnclosedPorch</code>, <code class="highlighter-rouge">BsmtFinSF2</code>, <code class="highlighter-rouge">ScreenPorch</code>, <code class="highlighter-rouge">MiscVal</code>, <code class="highlighter-rouge">LowQualFinSF</code>, <code class="highlighter-rouge">3SSnPorch</code>, and <code class="highlighter-rouge">PoolArea</code> stand out (all have $D \gt 0.8$)</p>
+
+</div>
+
+      </div>
+    </div>
+
+    <label for="sidebar-checkbox" class="sidebar-toggle"></label>
+
+    <script>
+      (function(document) {
+        var toggle = document.querySelector('.sidebar-toggle');
+        var sidebar = document.querySelector('#sidebar');
+        var checkbox = document.querySelector('#sidebar-checkbox');
+
+        document.addEventListener('click', functione. {
+          var target = e.target;
+
+          if(!checkbox.checked ||
+             sidebar.contains(target) ||
+             (target === checkbox || target === toggle)) return;
+
+          checkbox.checked = false;
+        }, false);
+      })(document);
+    </script>
+  </body>
+</html>
