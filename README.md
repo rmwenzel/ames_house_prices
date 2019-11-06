@@ -19,10 +19,10 @@ The project consists of three stages, processing, exploratory analysis, and pred
 
 ## Data
 
-There are several related datasets in `/data`:
+There are several related data files in `/data`:
 
-- `train.csv`, `test.csv` - Original Kaggle train and test sets
-- `orig.csv` - Full dataset with some metadata (`dtypes` and `MultiIndex`) for convenience in loading to `pandas.DataFrame`
+- `train.csv`, `test.csv` - Original Kaggle train and test data
+- `orig.csv` - Train and test data together with some metadata (`dtypes` and `MultiIndex`) for convenience in loading to `pandas.DataFrame`
 - `clean.csv` - Processed and cleaned version of `orig.csv`
 
-Both full and cleaned datasets are created and discussed in the notebook `process.ipynb`. They can also be built by running the script `process.py`
+Both `orig.csv` and `clean.csv` are created and discussed in the notebook `process.ipynb`. They can also be built by running the script `process.py`
