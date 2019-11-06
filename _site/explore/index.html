@@ -16,14 +16,14 @@
   </title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/temp/public/css/poole.css">
-  <link rel="stylesheet" href="/temp/public/css/syntax.css">
-  <link rel="stylesheet" href="/temp/public/css/lanyon.css">
+  <link rel="stylesheet" href="/ames_house_prices/public/css/poole.css">
+  <link rel="stylesheet" href="/ames_house_prices/public/css/syntax.css">
+  <link rel="stylesheet" href="/ames_house_prices/public/css/lanyon.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
 
   <!-- Icons
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/temp/public/apple-touch-icon-precomposed.png">
-  <link rel="shortcut icon" href="/temp/public/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/ames_house_prices/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/ames_house_prices/public/favicon.ico">
   --->
 
   <!-- RSS -->
@@ -48,9 +48,9 @@
 
   <nav class="sidebar-nav">
 
-    <a class="sidebar-nav-item" href="/temp/process/">Process</a>
-    <a class="sidebar-nav-item active" href="/temp/explore/">Explore</a>
-    <a class="sidebar-nav-item" href="/temp/model/">Model</a>
+    <a class="sidebar-nav-item" href="/ames_house_prices/process/">Process</a>
+    <a class="sidebar-nav-item active" href="/ames_house_prices/explore/">Explore</a>
+    <a class="sidebar-nav-item" href="/ames_house_prices/model/">Model</a>
 
   </nav>
 
@@ -68,8 +68,8 @@
       <div class="masthead">
         <div class="container">
           <h3 class="masthead-title">
-            <a href="/temp/" title="Home">Ames Housing Data</a>
-            <small>Analysis and predictive modeling of sale price</small>
+            <a href="/ames_house_prices/" title="Home">Ames Housing Data</a>
+            <small>analysis and predictive modeling</small>
           </h3>
         </div>
       </div>
@@ -77,7 +77,7 @@
       <div class="container content">
         <div class="page">
   <h1 class="page-title">Exploratory analysis</h1>
-  	<p>Previously, we <a href="/temp/process/">processed and cleaned</a> the Ames housing dataset. In this notebook, we focus on exploring the variables and the relationships among them. Later we’ll <a href="/temp/model/">model and predict sale prices</a>.</p>
+  	<p>Previously, we <a href="/ames_house_prices/process/">processed and cleaned</a> the Ames housing dataset. In this notebook, we focus on exploring the variables and the relationships among them. Later we’ll <a href="/ames_house_prices/model/">model and predict sale prices</a>.</p>
 
 <h2>Contents<span class="tocSkip"></span></h2>
 <div class="toc">
@@ -426,7 +426,7 @@ memory usage: 1.3+ MB
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11c407cc0&gt;
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_12_1.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_12_1.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
 <span class="n">sns</span><span class="o">.</span><span class="n">swarmplot</span><span class="p">(</span><span class="n">sale_price</span><span class="p">)</span>
@@ -435,7 +435,7 @@ memory usage: 1.3+ MB
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11c580d68&gt;
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_13_1.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_13_1.png" alt="png" /></p>
 
 <p>The distribution is positively skewed, with a long right tail. There are two observations with <code class="highlighter-rouge">SalePrice</code> &gt; 700000, and with a good separation from the rest of the points.</p>
 
@@ -458,7 +458,7 @@ memory usage: 1.3+ MB
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;matplotlib.axes._subplots.AxesSubplot at 0x11c733b00&gt;
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_18_1.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_18_1.png" alt="png" /></p>
 
 <h4 id="qq-plot">QQ-plot</h4>
 
@@ -471,7 +471,7 @@ memory usage: 1.3+ MB
 <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_20_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_20_0.png" alt="png" /></p>
 
 <p>The distribution appears to be approxiately log-normal, although the QQ plot shows the right tail is a bit longer than expected, and the two observations with highest <code class="highlighter-rouge">SalePrice</code> are much higher than expected.</p>
 
@@ -977,7 +977,7 @@ SaleCondition: Condition of sale
 <span class="n">plot_discrete_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">cats</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_31_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_31_0.png" alt="png" /></p>
 
 <p>Some of these variables have highly unbalanced distributions. We’ll look for the most extremely unbalanced</p>
 
@@ -1055,13 +1055,13 @@ Name: Electrical, dtype: float64
 <span class="n">plot_D_dep</span><span class="p">(</span><span class="n">cats_D_dep_df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_38_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_38_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot dependence distances less than 0.8</span>
 <span class="n">plot_low_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">cats_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_39_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_39_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank categorical variables by dependence distance</span>
 <span class="n">rank_pairs_by_D</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">cats_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
@@ -1158,7 +1158,7 @@ Name: log_SalePrice, Length: 2916, dtype: float64
 <span class="n">plot_violin_plots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">cats_data_num</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_46_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_46_0.png" alt="png" /></p>
 
 <p>Note that horizontal lines for variable values in the violin plots indicate &lt;5 observations having that value</p>
 
@@ -1760,7 +1760,7 @@ YrSold: Year Sold (YYYY)
 <span class="n">plot_discrete_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">11</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_58_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_58_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># look at most unbalanced distributions</span>
 <span class="n">unbal_ord_cols</span> <span class="o">=</span> <span class="n">print_unbal_dists</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">bal_threshold</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
@@ -1825,13 +1825,13 @@ Name: PoolQC, dtype: float64
 <span class="n">plot_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">ords_D_dep_df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_62_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_62_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot lower dependence distances of ordinal variables</span>
 <span class="n">plot_low_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">ords_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_63_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_63_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank ordinals by low dependence distance</span>
 <span class="n">rank_pairs_by_D</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">ords_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
@@ -1918,7 +1918,7 @@ Name: log_SalePrice, Length: 2916, dtype: float64
 <span class="n">plot_violin_plots</span><span class="p">(</span><span class="mi">11</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">30</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_68_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_68_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot dependence distance with log_SalePrice</span>
 <span class="n">D_dep_response</span><span class="p">(</span><span class="n">ords</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="s">'log_SalePrice'</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'D'</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
@@ -2724,7 +2724,7 @@ memory usage: 532.7+ KB
 <span class="n">plot_cont_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_82_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_82_0.png" alt="png" /></p>
 
 <p>Most of the variables are highly positively skewed</p>
 
@@ -2765,7 +2765,7 @@ dtype: float64
 <span class="n">plot_log_cont_dists</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">log_cols</span><span class="o">=</span><span class="n">log_cols</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_87_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_87_0.png" alt="png" /></p>
 
 <h3 id="relationships-among-quantitative-variables">Relationships among quantitative variables</h3>
 
@@ -2776,7 +2776,7 @@ dtype: float64
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;seaborn.axisgrid.PairGrid at 0x121036da0&gt;
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_89_1.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_89_1.png" alt="png" /></p>
 
 <p>While pairplots can be helpful, this one is a bit too big to be of much use, although it may inform later methods of detecting relationships.</p>
 
@@ -2801,13 +2801,13 @@ dtype: float64
 <span class="n">plot_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">quants_D_dep_df</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_93_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_93_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot lower dependence distances of quantitative variables</span>
 <span class="n">plot_low_D_dep</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">quants_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_94_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_94_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># display pairs of quantitatives with low dependence distance</span>
 <span class="n">rank_pairs_by_D</span><span class="p">(</span><span class="n">D_dep_df</span><span class="o">=</span><span class="n">quants_D_dep_df</span><span class="p">,</span> <span class="n">D_threshold</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
@@ -2922,13 +2922,13 @@ dtype: float64
 <span class="n">plot_corr</span><span class="p">(</span><span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_98_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_98_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot high absolute value of correlations of quantiatives</span>
 <span class="n">plot_high_corr</span><span class="p">(</span><span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">abs_corr_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_99_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_99_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank pairs of quantitatives by absolute values of correlation</span>
 <span class="n">rank_pairs_by_abs_corr_df</span> <span class="o">=</span> <span class="n">rank_pairs_by_abs_corr</span><span class="p">(</span><span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">abs_corr_threshold</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
@@ -3057,7 +3057,7 @@ Name: log_SalePrice, Length: 2916, dtype: float64
 <span class="n">plot_joint_dists_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_104_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_104_0.png" alt="png" /></p>
 
 <p>The distribution of some of the variables appears to be problematic for <code class="highlighter-rouge">seaborn</code> to fit a joint kernel density estimate. We’ll look at scatterplots instead</p>
 
@@ -3102,7 +3102,7 @@ Name: log_SalePrice, Length: 2916, dtype: float64
 <span class="n">plot_scatter_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_107_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_107_0.png" alt="png" /></p>
 
 <p>Now will look at scatterplots of log transformations of the quantitive variables vs. <code class="highlighter-rouge">log_SalePrice</code></p>
 
@@ -3110,7 +3110,7 @@ Name: log_SalePrice, Length: 2916, dtype: float64
 <span class="n">plot_log_scatter_with_response</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">quants_data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">20</span><span class="p">))</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/explore_109_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/explore_109_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># rank dependence distance of quantiatives with log_SalePrice</span>
 <span class="n">D_dep_response</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">quants</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">response</span><span class="o">=</span><span class="s">'log_SalePrice'</span><span class="p">)</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="n">by</span><span class="o">=</span><span class="s">'D'</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>

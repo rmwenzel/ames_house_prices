@@ -7,8 +7,8 @@ markdown:            kramdown
 title:               Ames Housing Data
 tagline:             'analysis and predictive modeling'
 description:         'Analysis and predictive modeling of sale prices in Ames Housing Dataset.'
-url:                 127.0.0.1:4000
-baseurl:             /temp
+url:                 https://rmwenzel.com
+baseurl:             /ames_house_prices
 
 # About/contact
 author:
