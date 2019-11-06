@@ -1,4 +1,3 @@
-# Predictive modeling of sale price in Ames housing dataset
 
 This project analyzes the [Ames housing data](http://jse.amstat.org/v19n3/decock.pdf) and predicts the final sale price of houses
 in that dataset. This is a learning project, based on the Kaggle Knowledge competition
@@ -15,3 +14,13 @@ The project consists of three stages, processing, exploratory analysis, and pred
 - `/data` - Datasets.
 - `/training` - Model training artifacts for persistence purposes
 - `/submissions` - Model predictions for submission to Kaggle competition (neccesary for evaluating performance predictive models since Kaggle has the test set) 
+
+## Data
+
+There are several related datasets in `/data`:
+
+- `train.csv`, `test.csv` - Original Kaggle train and test sets
+- `orig.csv` - Full dataset with some metadata (`dtypes` and `MultiIndex`) for convenience in loading to `pandas.DataFrame`
+- `clean.csv` - Processed and cleaned version of `orig.csv`
+
+Both full and cleaned datasets are created and discussed in the notebook `process.ipynb`. They can also be built by running the script `process.py`
