@@ -561,30 +561,28 @@ def add_stacks(ensembles, model_data, base_ests=None, meta_ests=None,
                suffix='', use_features_in_secondary=False,
                random_state=None):
     """Create stacking regressors from list of meta regressors."""
-    ensembles = copy.deepcopy(ensembles)
+    ensembles_copy = copy.deepcopy(ensembles)
 
-    for data_name in ensembles:
+    if not base_ests:
+        bases = {'ridge': Ridge(),
+                 'svr': SVR(),
+                 'xgb': XGBRegressor(objective='reg:squarederror',
+                                     n_jobs=-1,
+                                     random_state=random_state)}
+        base_ests = {data_name: bases for data_name in ensembles_copy}
+
+    if not meta_ests:
+        metas = {'ridge': Ridge(),
+                 'svr': SVR(),
+                 'xgb': XGBRegressor(objective='reg:squarederror',
+                                     n_jobs=-1,
+                                     random_state=random_state)}
+        meta_ests = {data_name: metas for data_name in ensembles_copy}
+
+    for data_name in ensembles_copy:
 
         X_train = model_data[data_name]['X_' + data_name + '_train']
         y_train = model_data[data_name]['y_' + data_name + '_train']
-
-        if not base_ests:
-            base_ests = defaultdict(dict)
-            base_ests[data_name] = {'ridge': Ridge(),
-                                    'svr': SVR(),
-                                    'xgb': XGBRegressor(
-                                           objective='reg:squarederror',
-                                           n_jobs=-1,
-                                           random_state=random_state)}
-
-        if not meta_ests:
-            meta_ests = defaultdict(dict)
-            meta_ests[data_name] = {'ridge': Ridge(),
-                                    'svr': SVR(),
-                                    'xgb': XGBRegressor(
-                                           objective='reg:squarederror',
-                                           n_jobs=-1,
-                                           random_state=random_state)}
 
         for meta_name in meta_ests[data_name]:
             stack_name = ('stack_' +
@@ -601,9 +599,9 @@ def add_stacks(ensembles, model_data, base_ests=None, meta_ests=None,
                                         random_state=random_state,
                                         n_jobs=-1)
             stack.fit(X_train.values, y_train.values)
-            ensembles[data_name][stack_name] = stack
+            ensembles_copy[data_name][stack_name] = stack
 
-    return ensembles
+    return ensembles_copy
 
 
 def compare_ens_performance(ensembles, ens_ho_results, model_data,
