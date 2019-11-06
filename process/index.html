@@ -16,14 +16,14 @@
   </title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="/temp/public/css/poole.css">
-  <link rel="stylesheet" href="/temp/public/css/syntax.css">
-  <link rel="stylesheet" href="/temp/public/css/lanyon.css">
+  <link rel="stylesheet" href="/ames_house_prices/public/css/poole.css">
+  <link rel="stylesheet" href="/ames_house_prices/public/css/syntax.css">
+  <link rel="stylesheet" href="/ames_house_prices/public/css/lanyon.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700%7CPT+Sans:400">
 
   <!-- Icons
-  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/temp/public/apple-touch-icon-precomposed.png">
-  <link rel="shortcut icon" href="/temp/public/favicon.ico">
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/ames_house_prices/public/apple-touch-icon-precomposed.png">
+  <link rel="shortcut icon" href="/ames_house_prices/public/favicon.ico">
   --->
 
   <!-- RSS -->
@@ -48,9 +48,9 @@
 
   <nav class="sidebar-nav">
 
-    <a class="sidebar-nav-item active" href="/temp/process/">Process</a>
-    <a class="sidebar-nav-item" href="/temp/explore/">Explore</a>
-    <a class="sidebar-nav-item" href="/temp/model/">Model</a>
+    <a class="sidebar-nav-item active" href="/ames_house_prices/process/">Process</a>
+    <a class="sidebar-nav-item" href="/ames_house_prices/explore/">Explore</a>
+    <a class="sidebar-nav-item" href="/ames_house_prices/model/">Model</a>
 
   </nav>
 
@@ -68,8 +68,8 @@
       <div class="masthead">
         <div class="container">
           <h3 class="masthead-title">
-            <a href="/temp/" title="Home">Ames Housing Data</a>
-            <small>Analysis and predictive modeling of sale price</small>
+            <a href="/ames_house_prices/" title="Home">Ames Housing Data</a>
+            <small>analysis and predictive modeling</small>
           </h3>
         </div>
       </div>
@@ -79,7 +79,7 @@
   <h1 class="page-title">Processing and cleaning</h1>
   	<p>The original dataset is available <a href="http://www.amstat.org/publications/jse/v19n3/decock/AmesHousing.xls">here</a>. A version of the dataset is available <a href="https://www.kaggle.com/c/house-prices-advanced-regression-techniques">on Kaggle</a>. This is the dataset we’ll be working with.</p>
 
-<p>First we’ll do preliminary processing and cleaning of the original dataset. Later we’ll <a href="/temp/explore/">explore the cleaned data and select/engineer features</a> and <a href="/temp/model">model and predict sale prices</a>.</p>
+<p>First we’ll do preliminary processing and cleaning of the original dataset. Later we’ll <a href="/ames_house_prices/explore/">explore the cleaned data and select/engineer features</a> and <a href="/ames_house_prices/model">model and predict sale prices</a>.</p>
 
 <h2>Contents<span class="tocSkip"></span></h2>
 <div class="toc">
@@ -1614,7 +1614,7 @@ YrSold: Year Sold (YYYY)
 <span class="n">plot_outliers</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/process_42_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/process_42_0.png" alt="png" /></p>
 
 <p>Kagglers seem to frequently conclude that the outliers are the house with overall quality 4 but a sale price of more than \$250,000, and the two houses with more than 4500 sq ft of general living area but sale prices less than \$300,000.</p>
 
@@ -1707,7 +1707,7 @@ dtype: int64
 <span class="n">plot_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/process_52_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/process_52_0.png" alt="png" /></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># variables missing values in train but not test set</span>
 <span class="n">train_missing</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span>
@@ -1801,7 +1801,7 @@ dtype: int64
 <span class="n">plot_both_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p><img src="/temp/assets/images/process_58_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/process_58_0.png" alt="png" /></p>
 
 <p>For variables missing values in both sets, the distributions are very similar, so we’ll go ahead and impute these values</p>
 
