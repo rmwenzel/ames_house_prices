@@ -7,12 +7,16 @@ from sklearn.preprocessing import LabelEncoder, MinMaxScaler
 from xgboost import XGBClassifier
 from statsmodels.imputation.mice import MICEData
 
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import seaborn as sns
 import warnings
 import time
 import os
+
 warnings.filterwarnings('ignore')
+sns.set_style('whitegrid')
 
 
 class DataDescription(dict):
@@ -1041,6 +1045,93 @@ def log_transform(data, log_cols):
                                              np.log(x))
     copy.drop(columns=log_cols)
     return copy
+
+
+def drop_mostly_missing_cols(hpdf):
+    """Drop columns with too many missing values."""
+    copy = hpdf.data.copy()
+    # drop columns with more than 20% values missing
+    notna_col_mask = ~ (copy.isna().sum()/len(copy) > 0.20)
+    notna_col_mask.loc['SalePrice'] = True
+    copy = copy.loc[:, notna_col_mask]
+    # drop columns associated with those
+    copy.drop(columns=['MiscVal'])
+    return copy
+
+
+def plot_outliers(hpdf):
+    """Plot variables which contain well-known outliers."""
+    plt.subplots(1, 2, figsize=(15, 10))
+    train = hpdf.data.loc['train', :]
+
+    plt.subplot(1, 2, 1)
+    sns.scatterplot(x='OverallQual', y='SalePrice', data=train)
+
+    plt.subplot(1, 2, 2)
+    sns.scatterplot(x='GrLivArea', y='SalePrice', data=train)
+
+
+def drop_outliers(hpdf):
+    """Drop some well-known outliers."""
+    copy = hpdf.data.copy()
+    # drop outliers in OverallQual
+    idx = copy[(copy['OverallQual'] < 5) &
+               (copy['SalePrice'] > 200000)].index[0][1]
+    copy = copy.drop(labels=[idx], axis=0, level='Id')
+    # drop outliers in GrLivArea
+    idx = copy[(copy['GrLivArea'] > 4000) &
+               (copy['SalePrice'] < 300000)].index[0][1]
+    copy = copy.drop(labels=[idx], axis=0, level='Id')
+
+    return copy
+
+
+def plot_train_and_test_missing_values(hpdf):
+    """Plot distribution of variables missing train or test values."""
+    copy = hpdf.data.drop(columns=['SalePrice'])
+    train = HPDataFramePlus(data=copy.loc['train', :])
+    test = HPDataFramePlus(data=copy.loc['test', :])
+
+    fig, _ = plt.subplots(1, 2, figsize=(15, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.title('Train')
+    train_missing_dist = train.na_counts()/train.na_counts().sum()
+    sns.barplot(x=train_missing_dist.index, y=train_missing_dist.values)
+    plt.xticks(rotation=75)
+
+    plt.subplot(1, 2, 2)
+    plt.title('Test')
+    test_missing_dist = test.na_counts()/test.na_counts().sum()
+    sns.barplot(x=test_missing_dist.index, y=test_missing_dist.values)
+    plt.xticks(rotation=75)
+
+
+def plot_both_train_and_test_missing_values(hpdf):
+    """Plot distributions variables missing both train and test values."""
+    copy = hpdf.data.drop(columns=['SalePrice'])
+
+    train_miss_dist = HPDataFramePlus(data=copy.loc['train', :]).na_counts()
+    train_miss_dist = train_miss_dist/sum(train_miss_dist)
+    test_miss_dist = HPDataFramePlus(data=copy.loc['test', :]).na_counts()
+    test_miss_dist = test_miss_dist/sum(test_miss_dist)
+
+    both_miss_index = set(train_miss_dist.index
+                          ).intersection(test_miss_dist.index)
+    train_miss_dist = train_miss_dist.loc[both_miss_index]
+    test_miss_dist = test_miss_dist.loc[both_miss_index]
+
+    fig, _ = plt.subplots(1, 2, figsize=(15, 6))
+
+    plt.subplot(1, 2, 1)
+    plt.title('Train')
+    sns.barplot(x=train_miss_dist.index, y=train_miss_dist.values)
+    plt.xticks(rotation=60)
+
+    plt.subplot(1, 2, 2)
+    plt.title('Test')
+    sns.barplot(x=test_miss_dist.index, y=test_miss_dist.values)
+    plt.xticks(rotation=60)
 
 
 if __name__ == '__main__':
