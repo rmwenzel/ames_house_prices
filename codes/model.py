@@ -7,6 +7,7 @@ import pandas as pd
 import seaborn as sns
 import pickle
 import copy
+import os
 
 from sklearn.linear_model import Ridge, BayesianRidge
 from sklearn.cross_decomposition import PLSRegression
@@ -19,6 +20,7 @@ from mlxtend.regressor import StackingCVRegressor
 from hyperopt import fmin, tpe, Trials
 from functools import partial
 from collections import defaultdict
+from numpy import nan as NaN
 
 
 def print_small_val_counts(data, val_count_threshold):
@@ -206,8 +208,8 @@ def train_test(data, response):
     """Train and test input and output data split."""
     X_train = data.loc['train'].drop(columns=[response])
     y_train = data.loc['train'][response]
-    X_test = data.loc['train'].drop(columns=[response])
-    y_test = data.loc['train'][response]
+    X_test = data.loc['test'].drop(columns=[response])
+    y_test = data.loc['test'][response]
     return X_train, y_train, X_test, y_test
 
 
@@ -290,6 +292,36 @@ def plot_model_comp(comp_df, col, hue, **kwargs):
     g.set_xticklabels(rotation=90)
 
 
+def rank_models_on_data(def_comp_cv, model_data):
+    """Rank models by cv performance."""
+    rank_df = def_comp_cv.copy()
+    tups = list(zip(model_data.keys(), len(model_data)*['cv_rmse']))
+    for tup in tups:
+        df = def_comp_cv.sort_values(by=tup, ascending=True)
+        for (i, model_name) in enumerate(df['model']):
+            idx = def_comp_cv[def_comp_cv['model']
+                              == model_name].index.values[0]
+            rank_df.loc[idx, tup] = i + 1
+    return rank_df
+
+
+def rank_models_across_data(def_comp_cv, model_data):
+    """Rank model cv across data sets."""
+    rank_df = def_comp_cv.copy()
+    for model_name in def_comp_cv['model']:
+        df = def_comp_cv[def_comp_cv['model'] == model_name].T
+        index = df.columns[-1]
+        df = df.drop(index='model')
+        df = df.sort_values(by=index)
+        df = df.reset_index()
+        for i in df.index:
+            tup = (df.loc[i]['data'], df.loc[i]['performance'])
+            model_idx = def_comp_cv[def_comp_cv['model']
+                                    == model_name].index.values[0]
+            rank_df.loc[model_idx, tup] = i + 1
+    return rank_df
+
+
 def remove_models(models, drop_models):
     """Drop models from consideration."""
     models = copy.deepcopy(models)
@@ -338,7 +370,7 @@ def ho_results(obj, space, est_name, X_train, y_train,
     return {'trials': trials, 'params': params}
 
 
-def rank_features(model, model_name, X_train, num_features,
+def plot_features(model, model_name, X_train, num_features,
                   figsize=None, rotation=None):
     """Plot most positive and negatively weighted features."""
     fig, ax = plt.subplots(nrows=1, ncols=2, figsize=figsize)
@@ -359,7 +391,7 @@ def rank_features(model, model_name, X_train, num_features,
     bot_df = bot_df.tail(num_features)
     plt.title('Best ' + model_name + ' ' + str(num_features) +
               ' most negative feature weights')
-    sns.barplot(x='feature', y='coef', data=bot_df, palette='Reds_r')
+    sns.barplot(x='feature', y='coef', data=bot_df, palette='Reds')
     plt.xticks(rotation=rotation)
 
     fig.tight_layout()
@@ -392,7 +424,7 @@ def convert_to_int(ho_results, conv_params):
     return copy
 
 
-def rank_xgb_features(xgb_model, X_train, num_features, figsize=None,
+def plot_xgb_features(xgb_model, X_train, num_features, figsize=None,
                       rotation=None):
     """Plot most important features of xgb model."""
     plt.figure(figsize=figsize)
@@ -563,28 +595,26 @@ def add_stacks(ensembles, model_data, base_ests=None, meta_ests=None,
     """Create stacking regressors from list of meta regressors."""
     ensembles = copy.deepcopy(ensembles)
 
+    if not base_ests:
+        ests = {'ridge': Ridge(),
+                'svr': SVR(),
+                'xgb': XGBRegressor(objective='reg:squarederror',
+                                    n_jobs=-1,
+                                    random_state=random_state)}
+        base_ests = {data_name: ests for data_name in ensembles}
+
+    if not meta_ests:
+        ests = {'ridge': Ridge(),
+                'svr': SVR(),
+                'xgb': XGBRegressor(objective='reg:squarederror',
+                                    n_jobs=-1,
+                                    random_state=random_state)}
+        meta_ests = {data_name: ests for data_name in ensembles}
+
     for data_name in ensembles:
 
         X_train = model_data[data_name]['X_' + data_name + '_train']
         y_train = model_data[data_name]['y_' + data_name + '_train']
-
-        if not base_ests:
-            base_ests = defaultdict(dict)
-            base_ests[data_name] = {'ridge': Ridge(),
-                                    'svr': SVR(),
-                                    'xgb': XGBRegressor(
-                                           objective='reg:squarederror',
-                                           n_jobs=-1,
-                                           random_state=random_state)}
-
-        if not meta_ests:
-            meta_ests = defaultdict(dict)
-            meta_ests[data_name] = {'ridge': Ridge(),
-                                    'svr': SVR(),
-                                    'xgb': XGBRegressor(
-                                           objective='reg:squarederror',
-                                           n_jobs=-1,
-                                           random_state=random_state)}
 
         for meta_name in meta_ests[data_name]:
             stack_name = ('stack_' +
@@ -636,3 +666,31 @@ def compare_ens_performance(ensembles, ens_ho_results, model_data,
     comp_df = comp_df.reset_index().rename(columns={'index': 'model'})
 
     return comp_df
+
+
+def save_top_model_predictions(ensembles, ens_comp_df, data_name, model_data,
+                               num_models, save_path):
+    """Save top model predictions to .csv for submission to Kaggle."""
+    top_df = ens_comp_df.sort_values(by=(data_name,
+                                     'cv_rmse')).head(num_models)
+    for model_name in top_df['model']:
+        X_test = model_data[data_name]['X_' + data_name + '_test']
+        y_pred = ensembles[data_name][model_name].predict(X_test.values)
+        # transform predictions for log_SalePrice back to SalePrice
+        y_pred = np.exp(y_pred)
+        submit = pd.DataFrame({'Id': X_test.index, 'SalePrice': y_pred})
+        file_name = model_name + '_' + data_name
+        file_name = os.path.join(save_path, file_name)
+        submit.to_csv(file_name, index=False)
+
+
+def test_comp(ens_comp_df):
+    """Empty DataFrame for comparison of final model test rmse."""
+    ens_comp_ce = ens_comp_df.sort_values(by=('clean_edit', 'cv_rmse'))
+    final_ce = ens_comp_ce.head(5)['model'].values
+    final_ce = [name + '_clean_edit' for name in final_ce]
+    ens_comp_de = ens_comp_df.sort_values(by=('drop_edit', 'cv_rmse'))
+    final_de = ens_comp_de.head(5)['model'].values
+    final_de = [name + '_drop_edit' for name in final_de]
+    final_model_names = final_ce + final_de
+    return pd.DataFrame({'models': final_model_names, 'test_rmse': NaN})
