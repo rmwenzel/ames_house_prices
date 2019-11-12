@@ -9,7 +9,7 @@ title: Processing and cleaning
 First we'll do preliminary processing and cleaning of the original dataset. Later we'll [explore the cleaned data and select/engineer features]({{site.baseurl}}/explore/) and [model and predict sale prices]({{site.baseurl}}/model).
 
 <h2>Contents<span class="tocSkip"></span></h2>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Setup" data-toc-modified-id="Setup-1">Setup</a></span></li><li><span><a href="#Load-and-inspect-Data" data-toc-modified-id="Load-and-inspect-Data-2">Load and inspect Data</a></span><ul class="toc-item"><li><span><a href="#Variable-descriptions" data-toc-modified-id="Variable-descriptions-2.1">Variable descriptions</a></span></li><li><span><a href="#Load-into-DataFrame" data-toc-modified-id="Load-into-DataFrame-2.2">Load into <code>DataFrame</code></a></span></li></ul></li><li><span><a href="#Clean-data" data-toc-modified-id="Clean-data-3">Clean data</a></span><ul class="toc-item"><li><span><a href="#Classify-variables-by-kind" data-toc-modified-id="Classify-variables-by-kind-3.1">Classify variables by kind</a></span></li><li><span><a href="#Encode-variables" data-toc-modified-id="Encode-variables-3.2">Encode variables</a></span></li><li><span><a href="#Drop-problematic-variables-and-observations" data-toc-modified-id="Drop-problematic-variables-and-observations-3.3">Drop problematic variables and observations</a></span></li><li><span><a href="#Missing-Values" data-toc-modified-id="Missing-Values-3.4">Missing Values</a></span><ul class="toc-item"><li><span><a href="#Inspect-train-and-test-distributions-of-missing-values" data-toc-modified-id="Inspect-train-and-test-distributions-of-missing-values-3.4.1">Inspect train and test distributions of missing values</a></span></li><li><span><a href="#Impute-small-numbers-of-missing-values-by-hand" data-toc-modified-id="Impute-small-numbers-of-missing-values-by-hand-3.4.2">Impute small numbers of missing values by hand</a></span></li><li><span><a href="#Impute-missing-categorical-values-with-XGBClassifier" data-toc-modified-id="Impute-missing-categorical-values-with-XGBClassifier-3.4.3">Impute missing categorical values with <code>XGBClassifier</code></a></span></li><li><span><a href="#Impute-missing-quantitative-values-with-MICE-and-PMM" data-toc-modified-id="Impute-missing-quantitative-values-with-MICE-and-PMM-3.4.4">Impute missing quantitative values with MICE and PMM</a></span></li></ul></li><li><span><a href="#Enforce-dtypes" data-toc-modified-id="Enforce-dtypes-3.5">Enforce dtypes</a></span></li></ul></li><li><span><a href="#Save-processed-data" data-toc-modified-id="Save-processed-data-4">Save processed data</a></span></li></ul></div>
+<div class="toc"><ul class="toc-item"><li><span><a href="#setup" data-toc-modified-id="Setup-1">Setup</a></span></li><li><span><a href="#load-and-inspect-data" data-toc-modified-id="Load-and-inspect-Data-2">Load and inspect Data</a></span><ul class="toc-item"><li><span><a href="#variable-descriptions" data-toc-modified-id="Variable-descriptions-2.1">Variable descriptions</a></span></li><li><span><a href="#load-into-dataframe" data-toc-modified-id="Load-into-DataFrame-2.2">Load into <code>DataFrame</code></a></span></li></ul></li><li><span><a href="#Clean-data" data-toc-modified-id="Clean-data-3">Clean data</a></span><ul class="toc-item"><li><span><a href="#classify-variables-by-kind" data-toc-modified-id="Classify-variables-by-kind-3.1">Classify variables by kind</a></span></li><li><span><a href="#encode-variables" data-toc-modified-id="Encode-variables-3.2">Encode variables</a></span></li><li><span><a href="#Drop-problematic-variables-and-observations" data-toc-modified-id="Drop-problematic-variables-and-observations-3.3">Drop problematic variables and observations</a></span></li><li><span><a href="#missing-values" data-toc-modified-id="Missing-Values-3.4">Missing Values</a></span><ul class="toc-item"><li><span><a href="#inspect-train-and-test-distributions-of-missing-values" data-toc-modified-id="Inspect-train-and-test-distributions-of-missing-values-3.4.1">Inspect train and test distributions of missing values</a></span></li><li><span><a href="#impute-small-numbers-of-missing-values-by-hand" data-toc-modified-id="Impute-small-numbers-of-missing-values-by-hand-3.4.2">Impute small numbers of missing values by hand</a></span></li><li><span><a href="#impute-missing-categorical-values-with-xgbclassifier" data-toc-modified-id="Impute-missing-categorical-values-with-XGBClassifier-3.4.3">Impute missing categorical values with <code>XGBClassifier</code></a></span></li><li><span><a href="#impute-missing-quantitative-values-with-mice-and-pmm" data-toc-modified-id="Impute-missing-quantitative-values-with-MICE-and-PMM-3.4.4">Impute missing quantitative values with MICE and PMM</a></span></li></ul></li><li><span><a href="#enforce-dtypes" data-toc-modified-id="Enforce-dtypes-3.5">Enforce dtypes</a></span></li></ul></li><li><span><a href="#save-processed-data" data-toc-modified-id="Save-processed-data-4">Save processed data</a></span></li></ul></div>
 
 ## Setup
 
@@ -17,14 +17,9 @@ First we'll do preliminary processing and cleaning of the original dataset. Late
 ```python
 # standard imports
 %matplotlib inline
-import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
-import seaborn as sns; sns.set_style('whitegrid')
-import warnings
-
 import os
 import sys
+from numpy import nan
 
 warnings.filterwarnings('ignore')
 # add parent directory for importing custom classes
@@ -33,7 +28,7 @@ sys.path.append(pardir)
 
 # custom class for data description
 from codes.process import *
-from numpy import nan
+
 ```
 
 ## Load and inspect Data
@@ -428,7 +423,7 @@ full.loc['test'].shape
 
 ## Clean data
 
-Note: all the functions in [this section](#Drop-problematic-variables-and-observations) are rolled into `HPDataFramePlus` methods `encode_ords, drop_probs`
+Note: all the functions in [this section](#drop-problematic-variables-and-observations) are rolled into `HPDataFramePlus` methods `encode_ords, drop_probs`
 
 Before we clean any data, we'll store the original dataset so we have an unadulaterated copy
 
@@ -1091,7 +1086,7 @@ orig.print_desc(cols)
     
 
 
-To classify the variables, there's really no alternative here than to carefully inspect the variable descriptions and determine which is which. To clarify our terms:
+To classify the variables, there's really no alternative here other than to carefully inspect the variable descriptions and determine which is which. To clarify our terms:
 
 - Categorical variables are discrete variables with no ordering (although they may have a numerical encoding)
 - Ordinal variables are discrete numeric variables, hence they have an ordering (and should be numerically encoded)
@@ -1100,10 +1095,16 @@ To classify the variables, there's really no alternative here than to carefully 
 
 ```python
 # split variables into categorical, ordinal, quantitative
-cat_cols = ['MSSubClass', 'MSZoning', 'Street', 'LandContour', 'LotConfig', 'Neighborhood', 
-            'Condition1', 'Condition2', 'BldgType', 'HouseStyle', 'RoofStyle', 'RoofMatl', 
-            'Exterior1st', 'Exterior2nd', 'MasVnrType', 'Foundation', 'Heating', 'CentralAir', 
-            'Electrical', 'GarageType', 'MiscFeature', 'SaleType', 'SaleCondition', 'Alley']
+cat_cols = ['MSSubClass', 'MSZoning', 'Street',
+            'LandContour', 'LotConfig',
+            'Neighborhood', 'Condition1',
+            'Condition2', 'BldgType', 'HouseStyle',
+            'RoofStyle', 'RoofMatl',
+            'Exterior1st', 'Exterior2nd',
+            'MasVnrType', 'Foundation', 'Heating',
+            'CentralAir', 'Electrical', 'GarageType',
+            'MiscFeature', 'SaleType',
+            'SaleCondition', 'Alley']
 ord_cols = ['LotShape', 'Utilities', 'LandSlope', 'OverallQual', 'OverallCond', 'ExterQual', 
             'ExterCond', 'BsmtQual', 'BsmtCond', 'BsmtExposure', 'BsmtFinType1', 'BsmtFinType2',
             'HeatingQC', 'BsmtFullBath', 'BsmtHalfBath', 'FullBath', 'HalfBath', 'BedroomAbvGr', 
@@ -1561,21 +1562,10 @@ clean.data = clean.encode_ords(mapper=ords)
 
 ### Drop problematic variables and observations
 
-Now that all variables are properly encoded, we can drop those with too many missing values immediately. We'll be somewhat conservative and drop variables missing $>20\%$ of values
+Now that all variables are properly encoded, we can drop those with too many missing values immediately. We'll be somewhat conservative and drop variables missing {% katexmm %} $>20\%$ {% endkatexmm %} of values
 
 
 ```python
-def drop_mostly_missing_cols(hpdf):
-    """Drop columns with too many missing values"""
-    copy = hpdf.data.copy()
-    # drop columns with more than 20% values missing
-    notna_col_mask = ~ (copy.isna().sum()/len(copy) > 0.20)
-    notna_col_mask.loc['SalePrice'] = True
-    copy = copy.loc[: , notna_col_mask]
-    # drop columns associated with those
-    copy.drop(columns=['MiscVal'])
-    return copy
-
 # create a new dataframe for cleaning
 clean.data = drop_mostly_missing_cols(clean)
 clean.update_col_kinds(clean.col_kinds)
@@ -1587,18 +1577,7 @@ First we'll plot the outliers (identifying them by their relationship to `SalePr
 
 
 ```python
-def plot_outliers(hpdf):
-    """Plot variables which contain well-known outliers."""
-    plt.subplots(1, 2, figsize=(15, 10))
-    train = hpdf.data.loc['train', :]
-    
-    plt.subplot(1, 2, 1)
-    sns.scatterplot(x='OverallQual', y='SalePrice', data=train)
-    
-    plt.subplot(1, 2, 2)
-    sns.scatterplot(x='GrLivArea', y='SalePrice', data=train)
-
-
+# plot variables which contain well-known outliers
 plot_outliers(clean)
 ```
 
@@ -1611,36 +1590,9 @@ Whether this is well-justified, and how much it's an example of groupthink, is a
 
 
 ```python
-def drop_outliers(hpdf):
-    copy = hpdf.data.copy()
-    # drop outliers in OverallQual
-    idx = copy[(copy['OverallQual'] < 5) & (copy['SalePrice'] > 200000)].index[0][1]
-    copy = copy.drop(labels=[idx], axis=0, level='Id')
-    # drop outliers in GrLivArea
-    idx = copy[(copy['GrLivArea'] > 4000) & (copy['SalePrice'] < 300000)].index[0][1]
-    copy = copy.drop(labels=[idx], axis=0, level='Id')
-    
-    return copy
-
+# drop well-known outliers
 clean.data = drop_outliers(clean)
 clean.update_col_kinds(clean.col_kinds)
-```
-
-Finally, we'll see if there are any categorical variables with extremely unbalanced distributions
-
-
-```python
-def print_unbal_dists(data, bal_threshold):
-    """Print distributions of columns with more than bal_threshold proportion concentrated at a single value."""
-    dists = []
-    for col in data.columns:
-        val_counts = data[col].value_counts()
-        dist = val_counts/sum(val_counts)
-        if dist.max() > bal_threshold:
-            dists += [dist]
-    for dist in dists:
-        print()
-        print(dist)
 ```
 
 ### Missing Values
@@ -1686,25 +1638,7 @@ clean.na_counts().drop('SalePrice')
 
 
 ```python
-def plot_train_and_test_missing_values(hpdf):
-    """plot distribution of missing train values."""
-    
-    copy = hpdf.data.drop(columns=['SalePrice'])
-    train = HPDataFramePlus(data=copy.loc['train', :])
-    test = HPDataFramePlus(data=copy.loc['test', :])
-    
-    fig, _ = plt.subplots(1, 2, figsize=(15, 6))
-    
-    plt.subplot(1, 2, 1)
-    train_missing_dist = train.na_counts()/train.na_counts().sum()
-    sns.barplot(x=train_missing_dist.index, y=train_missing_dist.values)
-    plt.xticks(rotation=75)
-    
-    plt.subplot(1, 2, 2)
-    test_missing_dist = test.na_counts()/test.na_counts().sum()
-    sns.barplot(x=test_missing_dist.index, y=test_missing_dist.values)
-    plt.xticks(rotation=75)
-
+# plot distributions of missing values in train and test sets
 plot_train_and_test_missing_values(clean)
 ```
 
@@ -1801,30 +1735,7 @@ Now let's look at the distributions of variables missing in both train and test 
 
 
 ```python
-def plot_both_train_and_test_missing_values(hpdf):
-    """plot distribution of missing train values."""
-    
-    copy = hpdf.data.drop(columns=['SalePrice'])
-    train_missing_dist = HPDataFramePlus(data=clean.data.loc['train', :]).na_counts()
-    train_missing_dist = train_missing_dist/sum(train_missing_dist)
-    
-    test_missing_dist = HPDataFramePlus(data=clean.data.loc['test', :]).na_counts()
-    test_missing_dist = test_missing_dist/sum(test_missing_dist)
-    
-    both_missing_index = set(train_missing_dist.index).intersection(test_missing_dist.index)
-    train_missing_dist = train_missing_dist.loc[both_missing_index]
-    test_missing_dist = test_missing_dist.loc[both_missing_index]
-    
-    fig, _ = plt.subplots(1, 2, figsize=(15, 6))
-    
-    plt.subplot(1, 2, 1)
-    sns.barplot(x=train_missing_dist.index, y=train_missing_dist.values)
-    plt.xticks(rotation=60)
-    
-    plt.subplot(1, 2, 2)
-    sns.barplot(x=test_missing_dist.index, y=test_missing_dist.values)
-    plt.xticks(rotation=60)
-
+# Plot distributions variables missing both train and test values.
 plot_both_train_and_test_missing_values(clean)
 ```
 
