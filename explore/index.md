@@ -3,10 +3,33 @@ layout: page
 title: Exploratory analysis
 ---
 
-Previously, we [processed and cleaned]({{site.baseurl}}/process/) the Ames housing dataset. In this notebook, we focus on exploring the variables and the relationships among them. Later we'll [model and predict sale prices]({{site.baseurl}}/model/).
+In a [previous notebook](process.ipynb/#Processing-the-Ames-housing-dataset), we processed and cleaned the Ames housing dataset. In this notebook, we focus on exploring the variables and the relationships among them. In a [later notebook](model.ipynb/#Modeling-and-predicting-SalePrice) we'll model and predict sale prices.
 
-<h2>Contents<span class="tocSkip"></span></h2>
-<div class="toc"><ul class="toc-item"><li><span><a href="#Setup" data-toc-modified-id="Setup-1">Setup</a></span></li><li><span><a href="#Load-and-inspect-data" data-toc-modified-id="Load-and-inspect-data-2">Load and inspect data</a></span></li><li><span><a href="#The-response-variable-SalePrice" data-toc-modified-id="The-response-variable-SalePrice-3">The response variable <code>SalePrice</code></a></span><ul class="toc-item"><li><span><a href="#Testing-log-normality" data-toc-modified-id="Testing-log-normality-3.1">Testing log-normality</a></span><ul class="toc-item"><li><span><a href="#QQ-plot" data-toc-modified-id="QQ-plot-3.1.1">QQ-plot</a></span></li><li><span><a href="#Kolmogorov---Smirnov-test" data-toc-modified-id="Kolmogorov---Smirnov-test-3.1.2">Kolmogorov - Smirnov test</a></span></li></ul></li></ul></li><li><span><a href="#Categorical-variables" data-toc-modified-id="Categorical-variables-4">Categorical variables</a></span><ul class="toc-item"><li><span><a href="#Distributions" data-toc-modified-id="Distributions-4.1">Distributions</a></span></li><li><span><a href="#Relationships-among-categorical-variables" data-toc-modified-id="Relationships-among-categorical-variables-4.2">Relationships among categorical variables</a></span></li><li><span><a href="#Relationships-between-categoricals-and-SalePrice" data-toc-modified-id="Relationships-between-categoricals-and-SalePrice-4.3">Relationships between categoricals and <code>SalePrice</code></a></span></li></ul></li><li><span><a href="#Ordinal-variables" data-toc-modified-id="Ordinal-variables-5">Ordinal variables</a></span><ul class="toc-item"><li><span><a href="#Distributions" data-toc-modified-id="Distributions-5.1">Distributions</a></span></li><li><span><a href="#Relationships-among-ordinal-variables" data-toc-modified-id="Relationships-among-ordinal-variables-5.2">Relationships among ordinal variables</a></span></li><li><span><a href="#Relationships-between-ordinals-and-SalePrice" data-toc-modified-id="Relationships-between-ordinals-and-SalePrice-5.3">Relationships between ordinals and <code>SalePrice</code></a></span><ul class="toc-item"><li><span><a href="#Rank-correlation-hypothesis-tests" data-toc-modified-id="Rank-correlation-hypothesis-tests-5.3.1">Rank correlation hypothesis tests</a></span></li></ul></li></ul></li><li><span><a href="#Quantitative-variables" data-toc-modified-id="Quantitative-variables-6">Quantitative variables</a></span><ul class="toc-item"><li><span><a href="#Relationships-among-quantitative-variables" data-toc-modified-id="Relationships-among-quantitative-variables-6.1">Relationships among quantitative variables</a></span></li><li><span><a href="#Relationships-between-quantitative-variables-and-SalePrice" data-toc-modified-id="Relationships-between-quantitative-variables-and-SalePrice-6.2">Relationships between quantitative variables and <code>SalePrice</code></a></span></li></ul></li></ul></div>
+## Contents
+
+- [Setup](#setup)
+
+- [Load and inspect data](#load-and-inspect-data)
+
+- [The response variable `SalePrice`](#the-response-variable-saleprice)
+	- [Testing log-normality](#testing-log-normality)
+		- [QQ-plot](#qq-plot)
+		- [Kolmogorov-Smirnov test](#kolmogorov-smirnov-test)
+
+- [Categorical variables](#categorical-variables)
+	-[Distributions of categorical variables](#distributions-of-categorical-variables)
+	- [Relationships among categorical variables](#relationships-among-categorical-variables)
+	- [Relationships between categoricals and `SalePrice`](#relationships-between-categoricals-and-saleprice)
+
+- [Ordinal variables](#ordinal-variables)
+	-[Distributions of ordinal variables](#distributions-of-ordinal-variables)
+	- [Relationships among ordinal variables](#relationships-among-ordinal-variables)
+	- [Relationships between ordinals and `SalePrice`](#relationships-between-ordinals-and-saleprice)
+
+- [Quantitative variables](#quantitative-variables)
+	-[Distributions of quantitative variables](#distributions-of-quantitative-variables)
+	- [Relationships among quantitative variables](#relationships-among-quantitative-variables)
+	- [Relationships between quantitatives and `SalePrice`](#relationships-between-quantitatives-and-saleprice)
 
 ## Setup
 
@@ -367,7 +390,7 @@ sns.distplot(sale_price)
 
 
 
-![png]({{site.baseurl}}/assets/images/explore_12_1.png)
+![png]({{site.baseurl}}/assets/images/explore_11_1.png)
 
 
 
@@ -384,7 +407,7 @@ sns.swarmplot(sale_price)
 
 
 
-![png]({{site.baseurl}}/assets/images/explore_13_1.png)
+![png]({{site.baseurl}}/assets/images/explore_12_1.png)
 
 
 The distribution is positively skewed, with a long right tail. There are two observations with `SalePrice` > 700000, and with a good separation from the rest of the points.
@@ -421,7 +444,7 @@ sns.distplot(np.log(sale_price))
 
 
 
-![png]({{site.baseurl}}/assets/images/explore_18_1.png)
+![png]({{site.baseurl}}/assets/images/explore_17_1.png)
 
 
 #### QQ-plot
@@ -438,7 +461,7 @@ plt.show()
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_20_0.png)
+![png]({{site.baseurl}}/assets/images/explore_19_0.png)
 
 
 The distribution appears to be approxiately log-normal, although the QQ plot shows the right tail is a bit longer than expected, and the two observations with highest `SalePrice` are much higher than expected.
@@ -955,7 +978,7 @@ cats.print_desc(cols=cats.data.columns)
     
 
 
-### Distributions
+### Distributions of categorical variables
 
 
 ```python
@@ -964,7 +987,7 @@ plot_discrete_dists(nrows=8, ncols=3, data=cats.data, figsize=(15, 30))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_31_0.png)
+![png]({{site.baseurl}}/assets/images/explore_30_0.png)
 
 
 Some of these variables have highly unbalanced distributions. We'll look for the most extremely unbalanced
@@ -1027,7 +1050,7 @@ The function
 
 $$d(X, Y) = H(X, Y) - I(X, Y)$$
 
-where $H(X, Y)$ is the joint entropy and $I(X, Y)$ the mutual information, [defines a metric](https://arxiv.org/pdf/q-bio/0311039.pdf) on the set of random variables. Note that
+where $H(X, Y)$ is the joint entropy and $I(X, Y)$ the mutual information, [defines a metric](https://arxiv.org/pdf/q-bio/0311039.pdf) on a set of discrete random variables. Note that
 
 $$d(X, Y) = H(X|Y) + H(Y|X)$$
 
@@ -1035,7 +1058,9 @@ which is sometimes called the "variation of information". One can normalize to g
 
 $$D(X, Y) = \frac{d(X, Y)}{H(X, Y)} = 1 - \frac{I(X, Y)}{H(X, Y)} $$
 
-i.e. $D(X, Y) \in [0, 1]$. Since $D$ is a metric, $D(X, Y) = 0$ iff $X = Y$ Furthermore, $D(X, Y) = 1$ if and only if $I(X, Y) = 0$ if and only if $X, Y$ are independendent. So we can take $D(X, Y)$ as a "dependence distance". The closer a variable $Y$ is to $X$, the more it depends on $X$.
+i.e. $D(X, Y) \in [0, 1]$. Since $D$ is a metric, $D(X, Y) = 0$ iff $X = Y$ Furthermore, $D(X, Y) = 1$ if and only if $I(X, Y) = 0$ if and only if $X, Y$ are independendent. So we can take $D(X, Y)$ as a "dependence distance". The closer a variable $Y$ is to $X$, the more it depends on $X$. 
+
+Of course, we don't know the true distributions of the random variables in this data set, but the sample size is large enough that the sample distributions should be a good approximation.
 
 
 ```python
@@ -1051,7 +1076,7 @@ plot_D_dep(cats_D_dep_df, figsize=(15, 10))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_38_0.png)
+![png]({{site.baseurl}}/assets/images/explore_37_0.png)
 
 
 
@@ -1061,7 +1086,7 @@ plot_low_D_dep(D_dep_df=cats_D_dep_df, D_threshold=0.8, figsize=(13, 8))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_39_0.png)
+![png]({{site.baseurl}}/assets/images/explore_38_0.png)
 
 
 
@@ -1127,11 +1152,11 @@ rank_pairs_by_D(D_dep_df=cats_D_dep_df, D_threshold=0.8)
 
 
 
- Notable pairs of distinct variables with low information distance are
+ Notable pairs of distinct variables with low dependence distance are
  
 - `Exterior1st` and `Exterior2nd` have the lowest dependence distance ($D \approx 0.322$). Their distributions are very similar and they have the same values. It probably makes more sense to think of them as close to identically distributed. 
 - `MSSubclass` and `HouseStyle` have the next lowest ($D \approx 0.47$). Inspecting their descriptions above we see that they have very similar categories, so they are measuring very similar things. `BldgType` and `MSSubclass` ($D \approx 0.71$) are similar. 
-- `MSSubclass` and `Neighborhood` ($D \approx 0.84$) are perhaps the first interesting pair in that they are measuring different things. We can imagine that the association between these two variables is strong -- it makes sense that the size/age/type of house would be associated to the neighborhood. Similarly, `Exterior1st`, `Exterior2nd`, `MSZoning`, `Foundation` also have strong associations with `Neighborhood`.
+- `MSSubclass` and `Neighborhood` ($D \approx 0.84$) are perhaps the first interesting pair in that they are measuring different things. We can imagine that the association between these two variables is somewhat strong -- it makes sense that the size/age/type of house would be related to the neighborhood. Similarly, `Exterior1st`, `Exterior2nd`, `MSZoning`, `Foundation` also have strong associations with `Neighborhood`.
 - `SaleCondition` and `SaleType` ($D \approx 0.67$) are also unsurprisingly associated. 
 
 ### Relationships between categoricals and `SalePrice`
@@ -1172,10 +1197,10 @@ plot_violin_plots(nrows=8, ncols=3, data=cats_data_num, response='log_SalePrice'
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_46_0.png)
+![png]({{site.baseurl}}/assets/images/explore_45_0.png)
 
 
-Note that horizontal lines for variable values in the violin plots indicate <5 observations having that value
+Note that horizontal lines for variable values in the violin plots indicate less than 5 observations having that value
 
 From these plots, it's difficult to determine with accuracy for which variables the distribution of `log_SalePrice` doesn't seem to vary greatly across values (and hence are of low dependence and thus low predictive value). The dependence distance between the variables and `log_SalePrice` will provide additional information.
 
@@ -1261,7 +1286,7 @@ D_dep_response(cats_data_num, 'log_SalePrice').sort_values(by='D').T
 
 
 
-The lower the dependence distance here, the better assocation with the response, hence the better potential predictive value.
+The lower the dependence distance here, the better assocation with the response, hence the better the potential predictive value.
 
 In particular, given how unbalanced their distributions are, it's perhaps not too surprising to see `RoofStyle`, `LandContour`, `Electrical` and `CentralAir` all have such high dependence distance, 
 
@@ -1788,7 +1813,7 @@ ords.print_desc(cols=ords.data.columns)
     
 
 
-### Distributions
+### Distributions of ordinal variables
 
 
 ```python
@@ -1797,7 +1822,7 @@ plot_discrete_dists(nrows=11, ncols=3, data=ords.data, figsize=(15, 30))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_58_0.png)
+![png]({{site.baseurl}}/assets/images/explore_57_0.png)
 
 
 
@@ -1871,7 +1896,7 @@ plot_D_dep(D_dep_df=ords_D_dep_df, figsize=(15, 10))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_62_0.png)
+![png]({{site.baseurl}}/assets/images/explore_61_0.png)
 
 
 
@@ -1881,7 +1906,7 @@ plot_low_D_dep(D_dep_df=ords_D_dep_df, D_threshold=0.8, figsize=(13, 8))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_63_0.png)
+![png]({{site.baseurl}}/assets/images/explore_62_0.png)
 
 
 
@@ -1941,7 +1966,7 @@ rank_pairs_by_D(D_dep_df=ords_D_dep_df, D_threshold=0.8)
 
 
 
- Notable pairs of distinct ordinal variables with low information distance are
+ Notable pairs of distinct ordinal variables with low dependence distance are
  
 - `Fireplaces` and `FireplaceQu` have the lowest dependence distance ($D \approx 0.53$). This is somewhat interesting, in that the quantities these variables are measuring are distinct (albeit related).
 - `GarageQual` and `GarageCond` have the next lowest ($D \approx 0.54$). Inspecting their descriptions above we see that they have very similar categories, so they are measuring very similar things. There is ostensibly a distinction between the quality of the garage and its condition, however.
@@ -1982,7 +2007,7 @@ plot_violin_plots(11, 3, ords.data, 'log_SalePrice', figsize=(15, 30))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_68_0.png)
+![png]({{site.baseurl}}/assets/images/explore_67_0.png)
 
 
 
@@ -2067,9 +2092,9 @@ D_dep_response(ords.data, 'log_SalePrice').sort_values(by='D').T
 
 
 
-Again variables with unbalanced distributions (e.g. `PoolQc`, `Utilities`) tend to have high information distance, as do variables for which the distribution of `log_SalePrice` doesn't differ much across their classes (e.g. `BsmtHalfBath`, `PavedDrive`, `LandSlope`).
+Again variables with unbalanced distributions (e.g. `PoolQc`, `Utilities`) tend to have high dependence distance, as do variables for which the distribution of `log_SalePrice` doesn't differ much across their classes (e.g. `BsmtHalfBath`, `PavedDrive`, `LandSlope`).
 
-That `OverallQual` has high dependence isn't surprising, but perhaps `MoSold` having the lowest is.
+That `OverallQual` has high dependence with `SalePrice` isn't surprising, but perhaps `MoSold` having the lowest is.
 
 #### Rank correlation hypothesis tests
 
@@ -2799,29 +2824,13 @@ quants.data.info()
     memory usage: 532.7+ KB
 
 
-
-```python
-def plot_cont_dists(nrows, ncols, data, figsize=None):
-    """Plot distributions of continuous variables."""
-    fig, ax = plt.subplots(nrows, ncols, figsize=figsize)
-
-    for (i, col) in enumerate(data.columns):
-        plt.subplot(nrows, ncols, i + 1)
-        series = data[col][data[col].notna()]
-        sns.distplot(series)
-        plt.xticks(rotation=60)
-
-    fig.tight_layout()
-```
-
-
 ```python
 # plot distributions of quantitative variables
 plot_cont_dists(nrows=6, ncols=4, data=quants.data, figsize=(15, 20))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_82_0.png)
+![png]({{site.baseurl}}/assets/images/explore_81_0.png)
 
 
 Most of the variables are highly positively skewed
@@ -2872,7 +2881,7 @@ plot_log_cont_dists(nrows=5, ncols=4, data=quants.data, log_cols=log_cols, figsi
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_87_0.png)
+![png]({{site.baseurl}}/assets/images/explore_86_0.png)
 
 
 ### Relationships among quantitative variables
@@ -2891,7 +2900,7 @@ sns.pairplot(quants.data)
 
 
 
-![png]({{site.baseurl}}/assets/images/explore_89_1.png)
+![png]({{site.baseurl}}/assets/images/explore_88_1.png)
 
 
 While pairplots can be helpful, this one is a bit too big to be of much use, although it may inform later methods of detecting relationships.
@@ -2918,7 +2927,7 @@ plot_D_dep(D_dep_df=quants_D_dep_df, figsize=(15, 10))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_93_0.png)
+![png]({{site.baseurl}}/assets/images/explore_92_0.png)
 
 
 
@@ -2928,7 +2937,7 @@ plot_low_D_dep(D_dep_df=quants_D_dep_df, D_threshold=0.8, figsize=(13, 8))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_94_0.png)
+![png]({{site.baseurl}}/assets/images/explore_93_0.png)
 
 
 
@@ -3032,21 +3041,7 @@ rank_pairs_by_D(D_dep_df=quants_D_dep_df, D_threshold=0.8).head(10)
 
 Compared to quantitative and ordinal variables pairs, pairs of quantitative variables are showing much higher dependencies (lower dependence distances) overall. For many of these pairs , the high dependence makes sense given both variables are measuring very similar areas, for example, `1stFlrSF`, `GrLivArea` and `TotalBsmtSF`.
 
-We expect that Pearsons' $rho$ (i.e. correlation/linear dependence) of these variables should be high as well.
-
-
-```python
-def plot_corr(quants_data, figsize=None):
-    """Plot (Pearson's) correlation as heatmap."""
-    plt.figure(figsize=figsize)
-    plt.title('Correlation/Linear Dependence')
-    cmap = sns.cm.rocket_r
-    corr = abs(quants_data.corr())
-    # Generate a mask for the upper triangle
-    mask = np.zeros_like(corr, dtype=np.bool)
-    mask[np.triu_indices_from(mask)] = True
-    sns.heatmap(corr, mask=mask, cmap=cmap)
-```
+We expect that Pearsons' $\rho$ (i.e. correlation/linear dependence) of these variables should be high as well.
 
 
 ```python
@@ -3055,7 +3050,7 @@ plot_corr(quants_data=quants.data, figsize=(15, 10))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_98_0.png)
+![png]({{site.baseurl}}/assets/images/explore_97_0.png)
 
 
 
@@ -3065,7 +3060,7 @@ plot_high_corr(quants_data=quants.data, abs_corr_threshold=0.5, figsize=(15, 10)
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_99_0.png)
+![png]({{site.baseurl}}/assets/images/explore_98_0.png)
 
 
 
@@ -3156,7 +3151,7 @@ rank_pairs_by_abs_corr_df
 
 
 
-### Relationships between quantitative variables and `SalePrice`
+### Relationships between quantitatives and `SalePrice`
 
 
 ```python
@@ -3183,78 +3178,16 @@ quants.data['log_SalePrice']
     Name: log_SalePrice, Length: 2916, dtype: float64
 
 
-
-
-```python
-def plot_joint_dists_with_response(nrows, ncols, quants_data, response,
-                                   figsize=None):
-    """Plot joint distributions of quantitatives and response."""
-    columns = quants_data.columns.drop(response)
-
-    fig, axes = plt.subplots(nrows, ncols, figsize=figsize)
-    fig.suptitle('KDE estimate of joint distribution of quantitative' +
-                 'variables and log of SalePrice', size=14)
-
-    for (i, col) in enumerate(columns):
-        j, k = i // ncols, i % ncols
-        sns.kdeplot(data=quants_data.loc['train', :][col],
-                    data2=quants_data.loc['train', :][response],
-                    shade=True, shade_lowest=False, ax=axes[j, k])
-
-    fig.tight_layout()
-    fig.subplots_adjust(top=0.96)
-```
-
-
 ```python
 # plot joint distributions of quantitative variables and log of sale price
 plot_joint_dists_with_response(nrows=6, ncols=4, quants_data=quants.data, response='log_SalePrice', figsize=(15, 20))
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_104_0.png)
+![png]({{site.baseurl}}/assets/images/explore_103_0.png)
 
 
 The distribution of some of the variables appears to be problematic for `seaborn` to fit a joint kernel density estimate. We'll look at scatterplots instead
-
-
-```python
-def plot_scatter_with_response(nrows, ncols, quants_data, response, figsize=None):
-    """Plot scatterplots of quantitatives and response."""
-    columns = quants_data.columns.drop(response)
-
-    fig, axes = plt.subplots(nrows, ncols, figsize=figsize)
-    fig.suptitle('Scatterplots of quantitative variables vs. ' +
-                 'log of SalePrice', size=14)
-
-    for (i, col) in enumerate(columns):
-        j, k = i // ncols, i % ncols
-        sns.scatterplot(x=quants_data.loc['train', :][col],
-                        y=quants_data.loc['train', :][response],
-                        data=quants_data, ax=axes[j, k])
-
-    fig.tight_layout()
-    fig.subplots_adjust(top=0.96)
-
-
-def plot_log_scatter_with_response(nrows, ncols, quants_data, response, figsize=None):
-    """Plot scatterplots of logs of quantitatives and response."""
-    columns = quants_data.columns.drop(response)
-
-    fig, axes = plt.subplots(nrows, ncols, figsize=figsize)
-    fig.suptitle('Scatterplots of log of quantitative variables vs.'
-                 + ' log of SalePrice', size=14)
-
-    for (i, col) in enumerate(columns):
-        j, k = i // ncols, i % ncols
-        sns.scatterplot(x=np.log(quants_data.loc['train', :][col]),
-                        y=quants_data.loc['train', :][response],
-                        data=quants_data, ax=axes[j, k])
-        axes[j, k].set_xlabel('log_' + col)
-
-    fig.tight_layout()
-    fig.subplots_adjust(top=0.96)
-```
 
 
 ```python
@@ -3263,7 +3196,7 @@ plot_scatter_with_response(nrows=6, ncols=4, quants_data=quants.data, response='
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_107_0.png)
+![png]({{site.baseurl}}/assets/images/explore_105_0.png)
 
 
 Now will look at scatterplots of log transformations of the quantitive variables vs. `log_SalePrice`
@@ -3275,7 +3208,7 @@ plot_log_scatter_with_response(nrows=6, ncols=4, quants_data=quants.data, respon
 ```
 
 
-![png]({{site.baseurl}}/assets/images/explore_109_0.png)
+![png]({{site.baseurl}}/assets/images/explore_107_0.png)
 
 
 
@@ -3360,4 +3293,4 @@ D_dep_response(data=quants.data, response='log_SalePrice').sort_values(by='D').T
 
 
 
-Considering the scatterplots and taking into account the dependence distance $D$, we see that some quantitative variables appear are likely to be less helpful in predicting `SalePrice`. Of these, `EnclosedPorch`, `BsmtFinSF2`, `ScreenPorch`, `MiscVal`, `LowQualFinSF`, `3SSnPorch`, and `PoolArea` stand out (all have $D \gt 0.8$)
+Considering the scatterplots and taking into account the dependence distance $D$, we see that some quantitative variables appear likely to be less helpful in predicting `SalePrice`. Of these, `EnclosedPorch`, `BsmtFinSF2`, `ScreenPorch`, `MiscVal`, `LowQualFinSF`, `3SSnPorch`, and `PoolArea` stand out (all have $D \gt 0.8$)
