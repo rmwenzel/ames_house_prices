@@ -441,13 +441,13 @@ def plot_xgb_features(xgb_model, X_train, num_features, figsize=None,
 
 def pickle_to_file(models, file_path):
     """Pickle object to file."""
-    with open(file_path, 'wb') as f:
+    with open(file_path, 'wb+') as f:
         pickle.dump(models, f)
 
 
 def pickle_from_file(file_path):
     """Load object from pickle file."""
-    with open(file_path, 'rb') as f:
+    with open(file_path, 'rb+') as f:
         models = pickle.load(f)
     return models
 
