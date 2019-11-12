@@ -5,8 +5,8 @@ markdown:            kramdown
 
 # Setup
 title:               Ames Housing Data
-tagline:             'analysis and predictive modeling'
-description:         'Analysis and predictive modeling of sale prices in Ames Housing Dataset.'
+tagline:             'Processing, analysis and predictive modeling'
+description:         'Processing, analysis and predictive modeling of sale prices in Ames Housing Dataset.'
 url:                 https://rmwenzel.com
 baseurl:             /ames_house_prices
 

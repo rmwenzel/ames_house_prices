@@ -3,18 +3,17 @@ layout: page
 title: Predictive modeling
 ---
 
-In a previous notebook we [processed and cleaned](process.ipynb/#Processing-the-Ames-housing-dataset) the Ames dataset, and in another we [explored the data](explore.ipynb/#Exploratory-analysis-of-Ames-housing-dataset).
+{% katexmm %}
+
+In a previous notebook we [processed and cleaned]({{site.baseurl}}/process/) the Ames dataset, and in another we [explored the data]({{site.baseurl}}/explore/).
 
 In this notebook, we'll model and predict `SalePrice`. First we'll do a little feature selection and engineering to create a few different versions of the data for modeling. Then we'll compare the prediction performance of some appropriate models on these versions, select a subset of these versions and models for fine-tuning, ensemble them to maximize predictive generalizablity, and test them by submitting to Kaggle.
 
 ## Contents
 
 - [Setup](#setup)
-
 - [Load and prepare data](#load-and-prepare-data)
-
 - [Feature selection and engineering](#feature-selection-and-engineering)
-
 - [Model selection and tuning](#model-selection-and-tuning)
 	- [Create modeling datasets](#create-modeling-datasets)
 	- [Compare default models for baseline](#compare-default-models-for-baseline)
@@ -24,7 +23,7 @@ In this notebook, we'll model and predict `SalePrice`. First we'll do a little f
 		- [Partial Least Squares](#partial-least-squares)
 		- [Support Vector Machine](#support-vector-machine)
 		- [Gradient Boosted Trees](#gradient-boosted-trees)
-	- [Compare tuned models and save parameters](#compare-tuned-models-and-save-parameters)
+		- [Compare tuned models and save parameters](#compare-tuned-models-and-save-parameters)
 	- [Tune Ensembles](#tune-ensembles)
 		- [Voting](#voting)
 			- [Default base and uniform weights](#default-base-and-uniform-weights)
@@ -38,7 +37,6 @@ In this notebook, we'll model and predict `SalePrice`. First we'll do a little f
 				- [Support Vector Machine meta](#svr-meta)
 				- [Gradient Boosted Tree meta](#gradient-boosted-tree-meta)
 			- [Compare ensembles](#compare-ensembles)
-
 - [Predict and Evaluate](#predict-and-evaluate)
 
 
@@ -855,7 +853,7 @@ plot_cont_dists(nrows=7, ncols=4, data=quants_data.drop(columns=['SalePrice']), 
 ```
 
 
-![png](model_files/model_34_0.png)
+![png]({{site.baseurl}}/assets/images/model_34_0.png)
 
 
 
@@ -1190,7 +1188,7 @@ plot_model_comp(def_comp_df, col='data', hue='performance', kind='bar',
 ```
 
 
-![png](model_files/model_53_0.png)
+![png]({{site.baseurl}}/assets/images/model_53_0.png)
 
 
 Unsurprisingly, all models (with the exception of `lasso` regression) had worse CV error than train error. However, for some models the difference was much greater, and these are likely overfitting. In particular, `dectree`, `extratree` had cv error roughly 5 orders of magnitude greater than train error, and `mlp`, `knn`, and `xgb` also saw significant increases.
@@ -1207,7 +1205,7 @@ plot_model_comp(def_comp_df, col='performance', hue='data', kind='bar',
 ```
 
 
-![png](model_files/model_55_0.png)
+![png]({{site.baseurl}}/assets/images/model_55_0.png)
 
 
 Based on cv rmse, the most promising models appear to be `ridge`, `bridge`, `xgb`, `svr`, and `pls`, which are ridge, Bayesian ridge, gradient boosted decision tree, support vector and partial least squared regressors, respectively.
@@ -1783,7 +1781,7 @@ plot_features(ridge_models['clean_edit']['ridge_tuned'], 'ridge regression', X_c
 ```
 
 
-![png](model_files/model_78_0.png)
+![png]({{site.baseurl}}/assets/images/model_78_0.png)
 
 
 The rankings of most positive feature weights are not too suprising. The most postively weighted feature was overall quality. We note condition variables and size variables are prominent. 
@@ -1931,7 +1929,7 @@ plot_features(bridge_models['clean_edit']['bridge_tuned'], 'Bayesian ridge regre
 ```
 
 
-![png](model_files/model_90_0.png)
+![png]({{site.baseurl}}/assets/images/model_90_0.png)
 
 
 Feature weight rankings are nearly identical to the ridge model.
@@ -2339,7 +2337,7 @@ plot_xgb_features(xgb_models['drop_edit']['xgb_tuned'], X_de_train, 10, figsize=
 ```
 
 
-![png](model_files/model_121_0.png)
+![png]({{site.baseurl}}/assets/images/model_121_0.png)
 
 
 On the `drop_edit` data, the top ten features for the gradient boosted trees regression model seem quite different from the top ten features of [ridge regression](#Ridge-regressor). Only `OverallQual` and `log_GrLivArea` appear in both, and whereas both rank `OverallQual` third, `ridge` ranks `log_GrLivArea` first while `xgb` ranks it tenth. While the top `ridge` features seemed plausible and natural, some of the top `xgb` features seem more surpising, especially the highest ranked feature `GarageType_Detached`.
@@ -2488,7 +2486,7 @@ plot_model_comp(tuned_comp_df, col='data', hue='performance', kind='bar', palett
 ```
 
 
-![png](model_files/model_126_0.png)
+![png]({{site.baseurl}}/assets/images/model_126_0.png)
 
 
 
@@ -2498,7 +2496,7 @@ plot_model_comp(tuned_comp_df, col='performance', hue='data', kind='bar', palett
 ```
 
 
-![png](model_files/model_127_0.png)
+![png]({{site.baseurl}}/assets/images/model_127_0.png)
 
 
 
@@ -2775,7 +2773,7 @@ xgb_meta_space = {'max_depth_xgb_meta': ho_scope.int(hp.quniform('max_depth_xgb_
                  }
 ```
 
-###### `Ridge` meta
+###### Ridge regression meta
 
 
 ```python
@@ -2867,7 +2865,7 @@ ensembles['drop_edit']['stack_ridge_tuned_second'] = \
                              random_state=27)
 ```
 
-###### `SVR` meta
+###### Support Vector Machine meta
 
 
 ```python
@@ -2955,7 +2953,7 @@ ensembles['drop_edit']['stack_svr_tuned_second'] = \
                              random_state=27)
 ```
 
-###### `XGBRegressor` meta
+###### Gradient Boosted Tree meta
 
 
 ```python
@@ -3452,7 +3450,7 @@ plot_model_comp(ens_comp_df.head(10), col='data', hue='performance',
 ```
 
 
-![png](model_files/model_185_0.png)
+![png]({{site.baseurl}}/assets/images/model_185_0.png)
 
 
 
@@ -3463,7 +3461,7 @@ plot_model_comp(ens_comp_df.head(10), col='performance', hue='data',
 ```
 
 
-![png](model_files/model_186_0.png)
+![png]({{site.baseurl}}/assets/images/model_186_0.png)
 
 
 Overall, ensembles with pretuned base models performed better than those that were tuned all at once. Voting ensembles with pretuned bases and stack ensembles with ridge and support vector meta models were top models for both data sets.
@@ -3619,3 +3617,5 @@ test_comp_df.std()
 To get a better sense of our model performances, we can consider average test error as a point estimate $$ \hat{\epsilon} = 0.12 $$. It's unclear from the instructions (or discussion) which logarithm base was used, but assuming it's natural log, this yields
 
 $$ 0.88 y_{actual}  \lessapprox y_{pred} \lessapprox 1.13 y_{actual} $$
+
+{% endkatexmm %}
