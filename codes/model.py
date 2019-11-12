@@ -693,4 +693,4 @@ def test_comp(ens_comp_df):
     final_de = ens_comp_de.head(5)['model'].values
     final_de = [name + '_drop_edit' for name in final_de]
     final_model_names = final_ce + final_de
-    return pd.DataFrame({'models': final_model_names, 'test_rmse': NaN})
+    return pd.DataFrame({'test_rmse': NaN}, index=final_model_names)
