@@ -307,3 +307,5 @@ def plot_log_scatter_with_response(nrows, ncols, quants_data, response):
 
     fig.tight_layout()
     fig.subplots_adjust(top=0.96)
+
+
