@@ -69,7 +69,7 @@
         <div class="container">
           <h3 class="masthead-title">
             <a href="/ames_house_prices/" title="Home">Ames Housing Data</a>
-            <small>analysis and predictive modeling</small>
+            <small>Processing, analysis and predictive modeling</small>
           </h3>
         </div>
       </div>
@@ -79,25 +79,22 @@
   <h1 class="page-title">Processing and cleaning</h1>
   	<p>The original dataset is available <a href="http://www.amstat.org/publications/jse/v19n3/decock/AmesHousing.xls">here</a>. A version of the dataset is available <a href="https://www.kaggle.com/c/house-prices-advanced-regression-techniques">on Kaggle</a>. This is the dataset we’ll be working with.</p>
 
-<p>First we’ll do preliminary processing and cleaning of the original dataset. Later we’ll <a href="/ames_house_prices/explore/">explore the cleaned data and select/engineer features</a> and <a href="/ames_house_prices/model">model and predict sale prices</a>.</p>
+<p>First we’ll do preliminary processing and cleaning of the original dataset. Later we’ll <a href="/ames_house_prices/explore/">explore the cleaned data</a> and <a href="/ames_house_prices/model">select/engineer features model and predict sale prices</a>.</p>
+
+<p>Local copies of all datasets are in <code class="highlighter-rouge">house_prices/data</code>. Custom helper code is in <code class="highlighter-rouge">codes/process.py</code>.</p>
 
 <h2>Contents<span class="tocSkip"></span></h2>
 <div class="toc">
-  <ul class="toc-item"><li><span><a href="#Setup" data-toc-modified-id="Setup-1">Setup</a></span></li><li><span><a href="#Load-and-inspect-Data" data-toc-modified-id="Load-and-inspect-Data-2">Load and inspect Data</a></span><ul class="toc-item"><li><span><a href="#Variable-descriptions" data-toc-modified-id="Variable-descriptions-2.1">Variable descriptions</a></span></li><li><span><a href="#Load-into-DataFrame" data-toc-modified-id="Load-into-DataFrame-2.2">Load into <code>DataFrame</code></a></span></li></ul></li><li><span><a href="#Clean-data" data-toc-modified-id="Clean-data-3">Clean data</a></span><ul class="toc-item"><li><span><a href="#Classify-variables-by-kind" data-toc-modified-id="Classify-variables-by-kind-3.1">Classify variables by kind</a></span></li><li><span><a href="#Encode-variables" data-toc-modified-id="Encode-variables-3.2">Encode variables</a></span></li><li><span><a href="#Drop-problematic-variables-and-observations" data-toc-modified-id="Drop-problematic-variables-and-observations-3.3">Drop problematic variables and observations</a></span></li><li><span><a href="#Missing-Values" data-toc-modified-id="Missing-Values-3.4">Missing Values</a></span><ul class="toc-item"><li><span><a href="#Inspect-train-and-test-distributions-of-missing-values" data-toc-modified-id="Inspect-train-and-test-distributions-of-missing-values-3.4.1">Inspect train and test distributions of missing values</a></span></li><li><span><a href="#Impute-small-numbers-of-missing-values-by-hand" data-toc-modified-id="Impute-small-numbers-of-missing-values-by-hand-3.4.2">Impute small numbers of missing values by hand</a></span></li><li><span><a href="#Impute-missing-categorical-values-with-XGBClassifier" data-toc-modified-id="Impute-missing-categorical-values-with-XGBClassifier-3.4.3">Impute missing categorical values with <code>XGBClassifier</code></a></span></li><li><span><a href="#Impute-missing-quantitative-values-with-MICE-and-PMM" data-toc-modified-id="Impute-missing-quantitative-values-with-MICE-and-PMM-3.4.4">Impute missing quantitative values with MICE and PMM</a></span></li></ul></li><li><span><a href="#Enforce-dtypes" data-toc-modified-id="Enforce-dtypes-3.5">Enforce dtypes</a></span></li></ul></li><li><span><a href="#Save-processed-data" data-toc-modified-id="Save-processed-data-4">Save processed data</a></span></li></ul>
+  <ul class="toc-item"><li><span><a href="#setup" data-toc-modified-id="Setup-1">Setup</a></span></li><li><span><a href="#load-and-inspect-data" data-toc-modified-id="Load-and-inspect-Data-2">Load and inspect Data</a></span><ul class="toc-item"><li><span><a href="#variable-descriptions" data-toc-modified-id="Variable-descriptions-2.1">Variable descriptions</a></span></li><li><span><a href="#load-into-dataframe" data-toc-modified-id="Load-into-DataFrame-2.2">Load into <code>DataFrame</code></a></span></li></ul></li><li><span><a href="#Clean-data" data-toc-modified-id="Clean-data-3">Clean data</a></span><ul class="toc-item"><li><span><a href="#classify-variables-by-kind" data-toc-modified-id="Classify-variables-by-kind-3.1">Classify variables by kind</a></span></li><li><span><a href="#encode-variables" data-toc-modified-id="Encode-variables-3.2">Encode variables</a></span></li><li><span><a href="#Drop-problematic-variables-and-observations" data-toc-modified-id="Drop-problematic-variables-and-observations-3.3">Drop problematic variables and observations</a></span></li><li><span><a href="#missing-values" data-toc-modified-id="Missing-Values-3.4">Missing Values</a></span><ul class="toc-item"><li><span><a href="#inspect-train-and-test-distributions-of-missing-values" data-toc-modified-id="Inspect-train-and-test-distributions-of-missing-values-3.4.1">Inspect train and test distributions of missing values</a></span></li><li><span><a href="#impute-small-numbers-of-missing-values-by-hand" data-toc-modified-id="Impute-small-numbers-of-missing-values-by-hand-3.4.2">Impute small numbers of missing values by hand</a></span></li><li><span><a href="#impute-missing-categorical-values-with-xgbclassifier" data-toc-modified-id="Impute-missing-categorical-values-with-XGBClassifier-3.4.3">Impute missing categorical values with <code>XGBClassifier</code></a></span></li><li><span><a href="#impute-missing-quantitative-values-with-mice-and-pmm" data-toc-modified-id="Impute-missing-quantitative-values-with-MICE-and-PMM-3.4.4">Impute missing quantitative values with MICE and PMM</a></span></li></ul></li><li><span><a href="#enforce-dtypes" data-toc-modified-id="Enforce-dtypes-3.5">Enforce dtypes</a></span></li></ul></li><li><span><a href="#save-processed-data" data-toc-modified-id="Save-processed-data-4">Save processed data</a></span></li></ul>
 </div>
 
 <h2 id="setup">Setup</h2>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># standard imports</span>
 <span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
-<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span><span class="p">;</span> <span class="n">sns</span><span class="o">.</span><span class="n">set_style</span><span class="p">(</span><span class="s">'whitegrid'</span><span class="p">)</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">nan</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">'ignore'</span><span class="p">)</span>
 <span class="c"># add parent directory for importing custom classes</span>
@@ -106,7 +103,7 @@
 
 <span class="c"># custom class for data description</span>
 <span class="kn">from</span> <span class="nn">codes.process</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">nan</span>
+
 </code></pre></div></div>
 
 <h2 id="load-and-inspect-data">Load and inspect Data</h2>
@@ -465,7 +462,7 @@ memory usage: 1.8+ MB
 
 <h2 id="clean-data">Clean data</h2>
 
-<p>Note: all the functions in <a href="#Drop-problematic-variables-and-observations">this section</a> are rolled into <code class="highlighter-rouge">HPDataFramePlus</code> methods <code class="highlighter-rouge">encode_ords, drop_probs</code></p>
+<p>Note: all the functions in <a href="#drop-problematic-variables-and-observations">this section</a> are rolled into <code class="highlighter-rouge">HPDataFramePlus</code> methods <code class="highlighter-rouge">encode_ords, drop_probs</code></p>
 
 <p>Before we clean any data, we’ll store the original dataset so we have an unadulaterated copy</p>
 
@@ -1122,7 +1119,7 @@ SaleCondition: Condition of sale
 	 Partial - Home was not completed when last assessed (associated with New Homes)
 </code></pre></div></div>
 
-<p>To classify the variables, there’s really no alternative here than to carefully inspect the variable descriptions and determine which is which. To clarify our terms:</p>
+<p>To classify the variables, there’s really no alternative here other than to carefully inspect the variable descriptions and determine which is which. To clarify our terms:</p>
 
 <ul>
   <li>Categorical variables are discrete variables with no ordering (although they may have a numerical encoding)</li>
@@ -1131,10 +1128,16 @@ SaleCondition: Condition of sale
 </ul>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># split variables into categorical, ordinal, quantitative</span>
-<span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">'MSSubClass'</span><span class="p">,</span> <span class="s">'MSZoning'</span><span class="p">,</span> <span class="s">'Street'</span><span class="p">,</span> <span class="s">'LandContour'</span><span class="p">,</span> <span class="s">'LotConfig'</span><span class="p">,</span> <span class="s">'Neighborhood'</span><span class="p">,</span> 
-            <span class="s">'Condition1'</span><span class="p">,</span> <span class="s">'Condition2'</span><span class="p">,</span> <span class="s">'BldgType'</span><span class="p">,</span> <span class="s">'HouseStyle'</span><span class="p">,</span> <span class="s">'RoofStyle'</span><span class="p">,</span> <span class="s">'RoofMatl'</span><span class="p">,</span> 
-            <span class="s">'Exterior1st'</span><span class="p">,</span> <span class="s">'Exterior2nd'</span><span class="p">,</span> <span class="s">'MasVnrType'</span><span class="p">,</span> <span class="s">'Foundation'</span><span class="p">,</span> <span class="s">'Heating'</span><span class="p">,</span> <span class="s">'CentralAir'</span><span class="p">,</span> 
-            <span class="s">'Electrical'</span><span class="p">,</span> <span class="s">'GarageType'</span><span class="p">,</span> <span class="s">'MiscFeature'</span><span class="p">,</span> <span class="s">'SaleType'</span><span class="p">,</span> <span class="s">'SaleCondition'</span><span class="p">,</span> <span class="s">'Alley'</span><span class="p">]</span>
+<span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">'MSSubClass'</span><span class="p">,</span> <span class="s">'MSZoning'</span><span class="p">,</span> <span class="s">'Street'</span><span class="p">,</span>
+            <span class="s">'LandContour'</span><span class="p">,</span> <span class="s">'LotConfig'</span><span class="p">,</span>
+            <span class="s">'Neighborhood'</span><span class="p">,</span> <span class="s">'Condition1'</span><span class="p">,</span>
+            <span class="s">'Condition2'</span><span class="p">,</span> <span class="s">'BldgType'</span><span class="p">,</span> <span class="s">'HouseStyle'</span><span class="p">,</span>
+            <span class="s">'RoofStyle'</span><span class="p">,</span> <span class="s">'RoofMatl'</span><span class="p">,</span>
+            <span class="s">'Exterior1st'</span><span class="p">,</span> <span class="s">'Exterior2nd'</span><span class="p">,</span>
+            <span class="s">'MasVnrType'</span><span class="p">,</span> <span class="s">'Foundation'</span><span class="p">,</span> <span class="s">'Heating'</span><span class="p">,</span>
+            <span class="s">'CentralAir'</span><span class="p">,</span> <span class="s">'Electrical'</span><span class="p">,</span> <span class="s">'GarageType'</span><span class="p">,</span>
+            <span class="s">'MiscFeature'</span><span class="p">,</span> <span class="s">'SaleType'</span><span class="p">,</span>
+            <span class="s">'SaleCondition'</span><span class="p">,</span> <span class="s">'Alley'</span><span class="p">]</span>
 <span class="n">ord_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">'LotShape'</span><span class="p">,</span> <span class="s">'Utilities'</span><span class="p">,</span> <span class="s">'LandSlope'</span><span class="p">,</span> <span class="s">'OverallQual'</span><span class="p">,</span> <span class="s">'OverallCond'</span><span class="p">,</span> <span class="s">'ExterQual'</span><span class="p">,</span> 
             <span class="s">'ExterCond'</span><span class="p">,</span> <span class="s">'BsmtQual'</span><span class="p">,</span> <span class="s">'BsmtCond'</span><span class="p">,</span> <span class="s">'BsmtExposure'</span><span class="p">,</span> <span class="s">'BsmtFinType1'</span><span class="p">,</span> <span class="s">'BsmtFinType2'</span><span class="p">,</span>
             <span class="s">'HeatingQC'</span><span class="p">,</span> <span class="s">'BsmtFullBath'</span><span class="p">,</span> <span class="s">'BsmtHalfBath'</span><span class="p">,</span> <span class="s">'FullBath'</span><span class="p">,</span> <span class="s">'HalfBath'</span><span class="p">,</span> <span class="s">'BedroomAbvGr'</span><span class="p">,</span> 
@@ -1577,20 +1580,9 @@ YrSold: Year Sold (YYYY)
 
 <h3 id="drop-problematic-variables-and-observations">Drop problematic variables and observations</h3>
 
-<p>Now that all variables are properly encoded, we can drop those with too many missing values immediately. We’ll be somewhat conservative and drop variables missing $&gt;20\%$ of values</p>
+<p>Now that all variables are properly encoded, we can drop those with too many missing values immediately. We’ll be somewhat conservative and drop variables missing  <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>&gt;</mo><mn>20</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">&gt;20\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.80556em;vertical-align:-0.05556em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mord">%</span></span></span></span>  of values</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">drop_mostly_missing_cols</span><span class="p">(</span><span class="n">hpdf</span><span class="p">):</span>
-    <span class="s">"""Drop columns with too many missing values"""</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">hpdf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="c"># drop columns with more than 20% values missing</span>
-    <span class="n">notna_col_mask</span> <span class="o">=</span> <span class="o">~</span> <span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">copy</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.20</span><span class="p">)</span>
-    <span class="n">notna_col_mask</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">True</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">loc</span><span class="p">[:</span> <span class="p">,</span> <span class="n">notna_col_mask</span><span class="p">]</span>
-    <span class="c"># drop columns associated with those</span>
-    <span class="n">copy</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'MiscVal'</span><span class="p">])</span>
-    <span class="k">return</span> <span class="n">copy</span>
-
-<span class="c"># create a new dataframe for cleaning</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># create a new dataframe for cleaning</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">drop_mostly_missing_cols</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">update_col_kinds</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">)</span>
 </code></pre></div></div>
@@ -1599,18 +1591,7 @@ YrSold: Year Sold (YYYY)
 
 <p>First we’ll plot the outliers (identifying them by their relationship to <code class="highlighter-rouge">SalePrice</code>)</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_outliers</span><span class="p">(</span><span class="n">hpdf</span><span class="p">):</span>
-    <span class="s">"""Plot variables which contain well-known outliers."""</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
-    <span class="n">train</span> <span class="o">=</span> <span class="n">hpdf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:]</span>
-    
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'OverallQual'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'SalePrice'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">train</span><span class="p">)</span>
-    
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="s">'GrLivArea'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s">'SalePrice'</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">train</span><span class="p">)</span>
-
-
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot variables which contain well-known outliers</span>
 <span class="n">plot_outliers</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
@@ -1620,34 +1601,9 @@ YrSold: Year Sold (YYYY)
 
 <p>Whether this is well-justified, and how much it’s an example of groupthink, is a matter for debate. But it seems to regularly improve the predictive capability of models, so we’ll follow suit.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">drop_outliers</span><span class="p">(</span><span class="n">hpdf</span><span class="p">):</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">hpdf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="c"># drop outliers in OverallQual</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">copy</span><span class="p">[(</span><span class="n">copy</span><span class="p">[</span><span class="s">'OverallQual'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">5</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">copy</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">200000</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s">'Id'</span><span class="p">)</span>
-    <span class="c"># drop outliers in GrLivArea</span>
-    <span class="n">idx</span> <span class="o">=</span> <span class="n">copy</span><span class="p">[(</span><span class="n">copy</span><span class="p">[</span><span class="s">'GrLivArea'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">4000</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">copy</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="mi">300000</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s">'Id'</span><span class="p">)</span>
-    
-    <span class="k">return</span> <span class="n">copy</span>
-
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># drop well-known outliers</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">drop_outliers</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">update_col_kinds</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">)</span>
-</code></pre></div></div>
-
-<p>Finally, we’ll see if there are any categorical variables with extremely unbalanced distributions</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">print_unbal_dists</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">bal_threshold</span><span class="p">):</span>
-    <span class="s">"""Print distributions of columns with more than bal_threshold proportion concentrated at a single value."""</span>
-    <span class="n">dists</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
-        <span class="n">val_counts</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="n">val_counts</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">val_counts</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dist</span><span class="o">.</span><span class="nb">max</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">bal_threshold</span><span class="p">:</span>
-            <span class="n">dists</span> <span class="o">+=</span> <span class="p">[</span><span class="n">dist</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">dist</span> <span class="ow">in</span> <span class="n">dists</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="n">dist</span><span class="p">)</span>
 </code></pre></div></div>
 
 <h3 id="missing-values">Missing Values</h3>
@@ -1685,25 +1641,7 @@ dtype: int64
 
 <p>Before we get into imputing them, to inform our choice of methods, let’s see how their distributions might differ across training and test sets. We want to be careful imputing missing values when those missing values are distributed unevenly across train and test sets if our goal is prediction, since our imputation could introduce further difference between train and test sets.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_train_and_test_missing_values</span><span class="p">(</span><span class="n">hpdf</span><span class="p">):</span>
-    <span class="s">"""plot distribution of missing train values."""</span>
-    
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">hpdf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
-    <span class="n">train</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:])</span>
-    <span class="n">test</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">copy</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'test'</span><span class="p">,</span> <span class="p">:])</span>
-    
-    <span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-    
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">train_missing_dist</span> <span class="o">=</span> <span class="n">train</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">/</span><span class="n">train</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">train_missing_dist</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">train_missing_dist</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">75</span><span class="p">)</span>
-    
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">test_missing_dist</span> <span class="o">=</span> <span class="n">test</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">/</span><span class="n">test</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="nb">sum</span><span class="p">()</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">test_missing_dist</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">test_missing_dist</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">75</span><span class="p">)</span>
-
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot distributions of missing values in train and test sets</span>
 <span class="n">plot_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
@@ -1774,30 +1712,7 @@ dtype: int64
 
 <p>Now let’s look at the distributions of variables missing in both train and test sets</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">plot_both_train_and_test_missing_values</span><span class="p">(</span><span class="n">hpdf</span><span class="p">):</span>
-    <span class="s">"""plot distribution of missing train values."""</span>
-    
-    <span class="n">copy</span> <span class="o">=</span> <span class="n">hpdf</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
-    <span class="n">train_missing_dist</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span>
-    <span class="n">train_missing_dist</span> <span class="o">=</span> <span class="n">train_missing_dist</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">train_missing_dist</span><span class="p">)</span>
-    
-    <span class="n">test_missing_dist</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'test'</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span>
-    <span class="n">test_missing_dist</span> <span class="o">=</span> <span class="n">test_missing_dist</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">test_missing_dist</span><span class="p">)</span>
-    
-    <span class="n">both_missing_index</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">train_missing_dist</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">test_missing_dist</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-    <span class="n">train_missing_dist</span> <span class="o">=</span> <span class="n">train_missing_dist</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">both_missing_index</span><span class="p">]</span>
-    <span class="n">test_missing_dist</span> <span class="o">=</span> <span class="n">test_missing_dist</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">both_missing_index</span><span class="p">]</span>
-    
-    <span class="n">fig</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
-    
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">train_missing_dist</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">train_missing_dist</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
-    
-    <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">test_missing_dist</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">test_missing_dist</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
-    <span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">(</span><span class="n">rotation</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
-
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Plot distributions variables missing both train and test values.</span>
 <span class="n">plot_both_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
