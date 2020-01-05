@@ -19,4 +19,4 @@ The project consists of three stages:
 3. [Predictive modeling]({{site.baseurl}}/model)
 
 
-There's also a [repo](https://github.com/rmwenzel/ames_housing_prices) with notebooks and code.
+There's also a [repo](https://github.com/rmwenzel/ames_house_prices) with notebooks and code.
