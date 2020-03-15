@@ -56,7 +56,7 @@
 
   <div class="sidebar-item">
     <p>
-      &copy; 2019.
+      &copy; 2020.
     </p>
   </div>
 </div>
@@ -81,7 +81,7 @@
 
 <p>First we’ll do preliminary processing and cleaning of the original dataset. Later we’ll <a href="/ames_house_prices/explore/">explore the cleaned data</a> and <a href="/ames_house_prices/model">select/engineer features model and predict sale prices</a>.</p>
 
-<p>Local copies of all datasets are in <code class="highlighter-rouge">house_prices/data</code>. Custom helper code is in <code class="highlighter-rouge">codes/process.py</code>.</p>
+<p>Local copies of all datasets are in <code class="language-plaintext highlighter-rouge">house_prices/data</code>. Custom helper code is in <code class="language-plaintext highlighter-rouge">codes/process.py</code>.</p>
 
 <h2>Contents<span class="tocSkip"></span></h2>
 <div class="toc">
@@ -90,19 +90,19 @@
 
 <h2 id="setup">Setup</h2>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># standard imports</span>
-<span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># standard imports
+</span><span class="o">%</span><span class="n">matplotlib</span> <span class="n">inline</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">nan</span>
 
 <span class="n">warnings</span><span class="o">.</span><span class="n">filterwarnings</span><span class="p">(</span><span class="s">'ignore'</span><span class="p">)</span>
-<span class="c"># add parent directory for importing custom classes</span>
-<span class="n">pardir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">))</span>
+<span class="c1"># add parent directory for importing custom classes
+</span><span class="n">pardir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">pardir</span><span class="p">))</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pardir</span><span class="p">)</span>
 
-<span class="c"># custom class for data description</span>
-<span class="kn">from</span> <span class="nn">codes.process</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="c1"># custom class for data description
+</span><span class="kn">from</span> <span class="nn">codes.process</span> <span class="kn">import</span> <span class="o">*</span>
 
 </code></pre></div></div>
 
@@ -110,23 +110,23 @@
 
 <h3 id="variable-descriptions">Variable descriptions</h3>
 
-<p>A description of the dataset variables is available in <code class="highlighter-rouge">data/data_description.txt</code>, but it requires a little bit of preprocessing. The custom augmented <code class="highlighter-rouge">dict</code> class <code class="highlighter-rouge">DataDescription</code> contains code to do this (see <code class="highlighter-rouge">house_prices/codes/preprocess.py</code>)</p>
+<p>A description of the dataset variables is available in <code class="language-plaintext highlighter-rouge">data/data_description.txt</code>, but it requires a little bit of preprocessing. The custom augmented <code class="language-plaintext highlighter-rouge">dict</code> class <code class="language-plaintext highlighter-rouge">DataDescription</code> contains code to do this (see <code class="language-plaintext highlighter-rouge">house_prices/codes/preprocess.py</code>)</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">desc</span> <span class="o">=</span> <span class="n">DataDescription</span><span class="p">(</span><span class="s">'../data/data_description.txt'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># First five variable names</span>
-<span class="nb">list</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:</span><span class="mi">5</span><span class="p">]</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># First five variable names
+</span><span class="nb">list</span><span class="p">(</span><span class="n">desc</span><span class="o">.</span><span class="n">keys</span><span class="p">())[:</span><span class="mi">5</span><span class="p">]</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['MSSubClass', 'MSZoning', 'LotFrontage', 'LotArea', 'Street']
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['MSSubClass', 'MSZoning', 'LotFrontage', 'LotArea', 'Street']
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># First variable description and values</span>
-<span class="n">desc</span><span class="p">[</span><span class="s">'MSSubClass'</span><span class="p">]</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># First variable description and values
+</span><span class="n">desc</span><span class="p">[</span><span class="s">'MSSubClass'</span><span class="p">]</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'Description': ' Identifies the type of dwelling involved in the sale.',
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>{'Description': ' Identifies the type of dwelling involved in the sale.',
  'Values': {'20': '1-STORY 1946 &amp; NEWER ALL STYLES',
   '30': '1-STORY 1945 &amp; OLDER',
   '40': '1-STORY W/FINISHED ATTIC ALL AGES',
@@ -145,9 +145,9 @@
   '190': '2 FAMILY CONVERSION - ALL STYLES AND AGES'}}
 </code></pre></div></div>
 
-<h3 id="load-into-dataframe">Load into <code class="highlighter-rouge">DataFrame</code></h3>
+<h3 id="load-into-dataframe">Load into <code class="language-plaintext highlighter-rouge">DataFrame</code></h3>
 
-<p>We’ll combine training and test data into a single <code class="highlighter-rouge">DataFrame</code></p>
+<p>We’ll combine training and test data into a single <code class="language-plaintext highlighter-rouge">DataFrame</code></p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">train</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'../data/train.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Id'</span><span class="p">)</span>
 <span class="n">test</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'../data/test.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s">'Id'</span><span class="p">)</span>
@@ -355,7 +355,7 @@
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">full</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
 MultiIndex: 2919 entries, (train, 1) to (test, 2919)
 Data columns (total 80 columns):
 MSSubClass       2919 non-null int64
@@ -442,48 +442,47 @@ dtypes: float64(12), int64(25), object(43)
 memory usage: 1.8+ MB
 </code></pre></div></div>
 
-<p>We can see some cleanup and preprocessing will be necessary. For example, there are quite a few missing values, and more than half the variables have been have been cast to <code class="highlighter-rouge">pandas</code> catch-all <code class="highlighter-rouge">object</code> dtype.</p>
+<p>We can see some cleanup and preprocessing will be necessary. For example, there are quite a few missing values, and more than half the variables have been have been cast to <code class="language-plaintext highlighter-rouge">pandas</code> catch-all <code class="language-plaintext highlighter-rouge">object</code> dtype.</p>
 
-<p>About half of the data is training data and half is testing data - observations from the testing data have <code class="highlighter-rouge">NaN</code> values for <code class="highlighter-rouge">SalePrice</code></p>
+<p>About half of the data is training data and half is testing data - observations from the testing data have <code class="language-plaintext highlighter-rouge">NaN</code> values for <code class="language-plaintext highlighter-rouge">SalePrice</code></p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># shape of training data</span>
-<span class="n">full</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># shape of training data
+</span><span class="n">full</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(1460, 80)
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(1460, 80)
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># shape of training data</span>
-<span class="n">full</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'test'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># shape of training data
+</span><span class="n">full</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'test'</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(1459, 80)
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(1459, 80)
 </code></pre></div></div>
 
 <h2 id="clean-data">Clean data</h2>
 
-<p>Note: all the functions in <a href="#drop-problematic-variables-and-observations">this section</a> are rolled into <code class="highlighter-rouge">HPDataFramePlus</code> methods <code class="highlighter-rouge">encode_ords, drop_probs</code></p>
+<p>Note: all the functions in <a href="#drop-problematic-variables-and-observations">this section</a> are rolled into <code class="language-plaintext highlighter-rouge">HPDataFramePlus</code> methods <code class="language-plaintext highlighter-rouge">encode_ords, drop_probs</code></p>
 
-<p>Before we clean any data, we’ll store the original dataset so we have an unadulaterated copy</p>
+<p>Before we clean any data, we’ll store the original dataset so we have an unadulterated copy</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># create instance of HPDataFramePlus for full dataset</span>
-<span class="n">orig</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># create instance of HPDataFramePlus for full dataset
+</span><span class="n">orig</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">)</span>
 </code></pre></div></div>
 
 <h3 id="classify-variables-by-kind">Classify variables by kind</h3>
+<p>Now we group variables in the original dataset into categorical, ordinal and quantitative kinds. We’ll use the custom class <code class="language-plaintext highlighter-rouge">HPDataFramePlus</code> which contains helpful methods.</p>
 
-<p>Since it doesn’t affect the data, we’ll group variables in the original dataset into categorical, ordinal and quantitative kinds. We’ll use the custom class <code class="highlighter-rouge">HPDataFramePlus</code> which contains helpful methods</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># set description attribute
+</span><span class="n">orig</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># set description attribute</span>
-<span class="n">orig</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">desc</span>
-
-<span class="c"># view description of all variables except sale price</span>
-<span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">full</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
+<span class="c1"># view description of all variables except sale price
+</span><span class="n">cols</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">full</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span>
 <span class="n">cols</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">'SalePrice'</span><span class="p">)</span>
 <span class="n">orig</span><span class="o">.</span><span class="n">print_desc</span><span class="p">(</span><span class="n">cols</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MSSubClass: Identifies the type of dwelling involved in the sale.
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MSSubClass: Identifies the type of dwelling involved in the sale.
 
 	 20 - 1-STORY 1946 &amp; NEWER ALL STYLES
 	 30 - 1-STORY 1945 &amp; OLDER
@@ -1127,8 +1126,8 @@ SaleCondition: Condition of sale
   <li>Quantiative variables are continuous numeric variables</li>
 </ul>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># split variables into categorical, ordinal, quantitative</span>
-<span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">'MSSubClass'</span><span class="p">,</span> <span class="s">'MSZoning'</span><span class="p">,</span> <span class="s">'Street'</span><span class="p">,</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># split variables into categorical, ordinal, quantitative
+</span><span class="n">cat_cols</span> <span class="o">=</span> <span class="p">[</span><span class="s">'MSSubClass'</span><span class="p">,</span> <span class="s">'MSZoning'</span><span class="p">,</span> <span class="s">'Street'</span><span class="p">,</span>
             <span class="s">'LandContour'</span><span class="p">,</span> <span class="s">'LotConfig'</span><span class="p">,</span>
             <span class="s">'Neighborhood'</span><span class="p">,</span> <span class="s">'Condition1'</span><span class="p">,</span>
             <span class="s">'Condition2'</span><span class="p">,</span> <span class="s">'BldgType'</span><span class="p">,</span> <span class="s">'HouseStyle'</span><span class="p">,</span>
@@ -1150,17 +1149,17 @@ SaleCondition: Condition of sale
               <span class="s">'EnclosedPorch'</span><span class="p">,</span> <span class="s">'3SsnPorch'</span><span class="p">,</span> <span class="s">'ScreenPorch'</span><span class="p">,</span> <span class="s">'PoolArea'</span><span class="p">,</span> <span class="s">'MiscVal'</span><span class="p">,</span>
               <span class="s">'SalePrice'</span><span class="p">]</span>
 
-<span class="c"># group columns by kind</span>
-<span class="n">col_kinds</span> <span class="o">=</span> <span class="p">{</span><span class="s">'cat'</span><span class="p">:</span> <span class="n">cat_cols</span><span class="p">,</span> <span class="s">'ord'</span><span class="p">:</span> <span class="n">ord_cols</span><span class="p">,</span> <span class="s">'quant'</span><span class="p">:</span> <span class="n">quant_cols</span><span class="p">}</span>
+<span class="c1"># group columns by kind
+</span><span class="n">col_kinds</span> <span class="o">=</span> <span class="p">{</span><span class="s">'cat'</span><span class="p">:</span> <span class="n">cat_cols</span><span class="p">,</span> <span class="s">'ord'</span><span class="p">:</span> <span class="n">ord_cols</span><span class="p">,</span> <span class="s">'quant'</span><span class="p">:</span> <span class="n">quant_cols</span><span class="p">}</span>
 
-<span class="c"># set col_kinds attribute</span>
-<span class="n">orig</span><span class="o">.</span><span class="n">col_kinds</span> <span class="o">=</span> <span class="n">col_kinds</span>
+<span class="c1"># set col_kinds attribute
+</span><span class="n">orig</span><span class="o">.</span><span class="n">col_kinds</span> <span class="o">=</span> <span class="n">col_kinds</span>
 </code></pre></div></div>
 
 <p>Now the cleaning begins.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># create new dataframe for cleaned data and set attributes</span>
-<span class="n">clean</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># create new dataframe for cleaned data and set attributes
+</span><span class="n">clean</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">full</span><span class="p">)</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="n">col_kinds</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">desc</span> <span class="o">=</span> <span class="n">orig</span><span class="o">.</span><span class="n">desc</span>
 </code></pre></div></div>
@@ -1169,11 +1168,11 @@ SaleCondition: Condition of sale
 
 <p>Before we can clean, we need to make sure all variables are encoded appropriately. Let’s compare the dtypes of our dataframe with the variable types</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># dtypes for categorical variables</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'cat'</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># dtypes for categorical variables
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'cat'</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
 MultiIndex: 2919 entries, (train, 1) to (test, 2919)
 Data columns (total 24 columns):
 MSSubClass       2919 non-null int64
@@ -1204,11 +1203,11 @@ dtypes: int64(1), object(23)
 memory usage: 578.8+ KB
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># dtypes for ordinal variables</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'ord'</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># dtypes for ordinal variables
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'ord'</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
 MultiIndex: 2919 entries, (train, 1) to (test, 2919)
 Data columns (total 33 columns):
 LotShape        2919 non-null object
@@ -1248,11 +1247,11 @@ dtypes: float64(3), int64(10), object(20)
 memory usage: 784.1+ KB
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># dtypes for quantitative variables</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'quant'</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># dtypes for quantitative variables
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="p">[</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'quant'</span><span class="p">]]</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
 MultiIndex: 2919 entries, (train, 1) to (test, 2919)
 Data columns (total 23 columns):
 LotFrontage      2433 non-null float64
@@ -1284,11 +1283,11 @@ memory usage: 556.0+ KB
 
 <p>Categorical and quantitative dtypes look good, but we’ll need to deal with the ordinal variables.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># inspect description of ordinal variables</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">print_desc</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'ord'</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># inspect description of ordinal variables
+</span><span class="n">clean</span><span class="o">.</span><span class="n">print_desc</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'ord'</span><span class="p">])</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotShape: General shape of property
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotShape: General shape of property
 
 	 Reg - Regular
 	 IR1 - Slightly irregular
@@ -1546,8 +1545,8 @@ YrSold: Year Sold (YYYY)
 
 <p>Upon careful reflection, we’ll encode the ordinal variable values by hand (taking care to distinguish between values of 0 and truly missing values)</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># encode ordinal variable values in dictionary by hand when needed</span>
-<span class="n">ords</span> <span class="o">=</span> <span class="p">{}</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># encode ordinal variable values in dictionary by hand when needed
+</span><span class="n">ords</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">ords</span><span class="p">[</span><span class="s">'GarageCond'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">'Po'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">'Fa'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">'TA'</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s">'Gd'</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="s">'Ex'</span><span class="p">:</span> <span class="mi">5</span><span class="p">}</span>
 <span class="n">ords</span><span class="p">[</span><span class="s">'BsmtCond'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ords</span><span class="p">[</span><span class="s">'GarageCond'</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">ords</span><span class="p">[</span><span class="s">'BsmtCond'</span><span class="p">]</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'Ex'</span><span class="p">)</span>
@@ -1574,35 +1573,33 @@ YrSold: Year Sold (YYYY)
 <span class="n">ords</span><span class="p">[</span><span class="s">'PoolQC'</span><span class="p">]</span> <span class="o">=</span> <span class="n">ords</span><span class="p">[</span><span class="s">'BsmtQual'</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">ords</span><span class="p">[</span><span class="s">'Utilities'</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">nan</span><span class="p">:</span> <span class="n">nan</span><span class="p">,</span> <span class="s">'ELO'</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">'NoSeWa'</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s">'NoSewr'</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s">'AllPub'</span><span class="p">:</span> <span class="mi">3</span><span class="p">}</span>
 
-<span class="c"># perform encoding</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">encode_ords</span><span class="p">(</span><span class="n">mapper</span><span class="o">=</span><span class="n">ords</span><span class="p">)</span>
+<span class="c1"># perform encoding
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">encode_ords</span><span class="p">(</span><span class="n">mapper</span><span class="o">=</span><span class="n">ords</span><span class="p">)</span>
 </code></pre></div></div>
 
 <h3 id="drop-problematic-variables-and-observations">Drop problematic variables and observations</h3>
 
-<p>Now that all variables are properly encoded, we can drop those with too many missing values immediately. We’ll be somewhat conservative and drop variables missing  <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mo>&gt;</mo><mn>20</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">&gt;20\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.80556em;vertical-align:-0.05556em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mord">%</span></span></span></span>  of values</p>
+<p>Now that all variables are properly encoded, we can drop those with too many missing values immediately. We’ll be somewhat conservative and drop variables missing  <span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>20</mn><mi mathvariant="normal">%</mi></mrow><annotation encoding="application/x-tex">&gt;20\%</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.80556em;vertical-align:-0.05556em;"></span><span class="mord">2</span><span class="mord">0</span><span class="mord">%</span></span></span></span>  of values</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># create a new dataframe for cleaning</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">drop_mostly_missing_cols</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># create a new dataframe for cleaning
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">drop_mostly_missing_cols</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">update_col_kinds</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p>We’ll also drop some well-known outlying observations (at least, well-known on Kaggle ) in the training data. Dropping outliers is (for good reason) very controversial, and one should take great care in doing so. The justification for it depends on context, however. In our case, the end goal is to predict <code class="highlighter-rouge">SalePrice</code> accuractely. If dropping outliers improves the ability of our prediction model to generalize, than this may provide some retroactive justification.</p>
+<p>We’ll also drop some well-known (on Kaggle at least)outlying observations  in the training data. Dropping outliers is (for good reason) controversial, and one should take great care in doing so. The justification for it depends on context, however. In our case, the end goal is to predict <code class="language-plaintext highlighter-rouge">SalePrice</code> accuractely. If dropping outliers improves the ability of our prediction model to generalize, than this may provide some retroactive justification.</p>
 
-<p>First we’ll plot the outliers (identifying them by their relationship to <code class="highlighter-rouge">SalePrice</code>)</p>
+<p>First we’ll plot the outliers (identifying them by their relationship to <code class="language-plaintext highlighter-rouge">SalePrice</code>)</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot variables which contain well-known outliers</span>
-<span class="n">plot_outliers</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># plot variables which contain well-known outliers
+</span><span class="n">plot_outliers</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p><img src="/ames_house_prices/assets/images/process_42_0.png" alt="png" /></p>
 
-<p>Kagglers seem to frequently conclude that the outliers are the house with overall quality 4 but a sale price of more than \$250,000, and the two houses with more than 4500 sq ft of general living area but sale prices less than \$300,000.</p>
+<p>Kagglers seem to frequently conclude that the outliers are the house with overall quality 4 but a sale price of more than $250,000, and the two houses with more than 4500 sq ft of general living area but sale prices less than $300,000. Since it seems to regularly improve the predictive capability of models, so we’ll follow suit.</p>
 
-<p>Whether this is well-justified, and how much it’s an example of groupthink, is a matter for debate. But it seems to regularly improve the predictive capability of models, so we’ll follow suit.</p>
-
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># drop well-known outliers</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">drop_outliers</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># drop well-known outliers
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">drop_outliers</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 <span class="n">clean</span><span class="o">.</span><span class="n">update_col_kinds</span><span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">)</span>
 </code></pre></div></div>
 
@@ -1610,11 +1607,11 @@ YrSold: Year Sold (YYYY)
 
 <p>Our dataset is missing a lot of values!</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># counts of missing values by variable, excluding SalePrice</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s">'SalePrice'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># counts of missing values by variable, excluding SalePrice
+</span><span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s">'SalePrice'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MSZoning          4
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>MSZoning          4
 LotFrontage     485
 Utilities         2
 Exterior1st       1
@@ -1641,28 +1638,28 @@ dtype: int64
 
 <p>Before we get into imputing them, to inform our choice of methods, let’s see how their distributions might differ across training and test sets. We want to be careful imputing missing values when those missing values are distributed unevenly across train and test sets if our goal is prediction, since our imputation could introduce further difference between train and test sets.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># plot distributions of missing values in train and test sets</span>
-<span class="n">plot_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># plot distributions of missing values in train and test sets
+</span><span class="n">plot_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
 <p><img src="/ames_house_prices/assets/images/process_52_0.png" alt="png" /></p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># variables missing values in train but not test set</span>
-<span class="n">train_missing</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># variables missing values in train but not test set
+</span><span class="n">train_missing</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'train'</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span>
 <span class="n">test_missing</span> <span class="o">=</span> <span class="n">HPDataFramePlus</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="s">'test'</span><span class="p">,</span> <span class="p">:])</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span>
 <span class="n">train_not_test</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">train_missing</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">test_missing</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 <span class="n">train_not_test</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['Electrical']
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['Electrical']
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># variables missing values in test but not train set</span>
-<span class="n">test_not_train</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">test_missing</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">train_missing</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># variables missing values in test but not train set
+</span><span class="n">test_not_train</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">test_missing</span><span class="o">.</span><span class="n">index</span><span class="p">)</span><span class="o">.</span><span class="n">difference</span><span class="p">(</span><span class="n">train_missing</span><span class="o">.</span><span class="n">index</span><span class="p">))</span>
 <span class="n">test_not_train</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['GarageArea',
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>['GarageArea',
  'Exterior2nd',
  'BsmtHalfBath',
  'BsmtUnfSF',
@@ -1679,19 +1676,19 @@ dtype: int64
  'SalePrice']
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># count of variables missing values in train but not test set</span>
-<span class="n">train_missing</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_not_test</span><span class="p">]</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># count of variables missing values in train but not test set
+</span><span class="n">train_missing</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_not_test</span><span class="p">]</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Electrical    1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Electrical    1
 dtype: int64
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># count of variables missing values in test but not train</span>
-<span class="n">test_missing</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">test_not_train</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># count of variables missing values in test but not train
+</span><span class="n">test_missing</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">test_not_train</span><span class="p">]</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GarageArea      1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GarageArea      1
 Exterior2nd     1
 BsmtHalfBath    2
 BsmtUnfSF       1
@@ -1712,29 +1709,29 @@ dtype: int64
 
 <p>Now let’s look at the distributions of variables missing in both train and test sets</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Plot distributions variables missing both train and test values.</span>
-<span class="n">plot_both_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Plot distributions variables missing both train and test values.
+</span><span class="n">plot_both_train_and_test_missing_values</span><span class="p">(</span><span class="n">clean</span><span class="p">)</span>
 </code></pre></div></div>
 
-<p><img src="/ames_house_prices/assets/images/process_58_0.png" alt="png" /></p>
+<p><img src="/ames_house_prices/assets/images/process_55_0.png" alt="png" /></p>
 
 <p>For variables missing values in both sets, the distributions are very similar, so we’ll go ahead and impute these values</p>
 
 <h4 id="impute-small-numbers-of-missing-values-by-hand">Impute small numbers of missing values by hand</h4>
 
-<p>Imputation of missing values using point estimates (mean, mode, etc.) is very common but arguable somewhat crude. Since there are more sophisticated methods which aren’t too difficult to use, we’d like to use them. They are however, a bit more computationally expensive. Since many of our variables are only missing a few values, imputing these values by hand using point estimates will cut down on computational cost while sacrificing little.</p>
+<p>Imputation of missing values using point estimates (mean, mode, etc.) is very common but can be too simplistic. Since there are more sophisticated methods which aren’t too difficult to use, we’d like to use them. They are however, a bit more computationally expensive. Since many of our variables are only missing a few values, imputing these values by hand using point estimates will cut down on computational cost while sacrificing little.</p>
 
 <p>An excellent, thorough treatment of imputation can be found in <a href="https://stefvanbuuren.name/fimd/">Flexible Imputation of Missing Data</a> by Stef Van Buren.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Impute variables with &lt;= 4 missing values. Use mode for categoricals, median for quantitatives</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">hand_impute</span><span class="p">()</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Impute variables with &lt;= 4 missing values. Use mode for categoricals, median for quantitatives
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">hand_impute</span><span class="p">()</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># missing value counts again</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># missing value counts again
+</span><span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotFrontage    485
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotFrontage    485
 MasVnrType      24
 MasVnrArea      23
 GarageType     157
@@ -1742,19 +1739,19 @@ GarageYrBlt    159
 dtype: int64
 </code></pre></div></div>
 
-<h4 id="impute-missing-categorical-values-with-xgbclassifier">Impute missing categorical values with <code class="highlighter-rouge">XGBClassifier</code></h4>
+<h4 id="impute-missing-categorical-values-with-xgbclassifier">Impute missing categorical values with <code class="language-plaintext highlighter-rouge">XGBClassifier</code></h4>
 
-<p>Some methods for imputing missing categorical data are more common, e.g. multinomial classification, but any classifier will do. Given time and the inclination, one could explore different classifiers and try to estimate their imputation accuracy (e.g. by cross-validation on data with no missing values) but we won’t do that here. Since <code class="highlighter-rouge">xgboost</code> classifier often performs very well with defaults, we’ll use it to impute <code class="highlighter-rouge">MasVnrType</code> and <code class="highlighter-rouge">GarageType</code>.</p>
+<p>Some methods for imputing missing categorical data are more common, e.g. multinomial classification, but any classifier may do. Given time and the inclination, one could explore different classifiers and try to estimate their imputation accuracy (e.g. by cross-validation on data with no missing values) but we won’t do that here. Since <code class="language-plaintext highlighter-rouge">xgboost</code> classifier often performs very well with defaults, we’ll use it to impute <code class="language-plaintext highlighter-rouge">MasVnrType</code> and <code class="language-plaintext highlighter-rouge">GarageType</code>.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># impute missing categorical values with XGBClassifier</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">impute_cats</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s">'SalePrice'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># impute missing categorical values with XGBClassifier
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">impute_cats</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s">'SalePrice'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># missing value counts again</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># missing value counts again
+</span><span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotFrontage    485
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>LotFrontage    485
 MasVnrArea      23
 GarageYrBlt    159
 dtype: int64
@@ -1762,22 +1759,22 @@ dtype: int64
 
 <h4 id="impute-missing-quantitative-values-with-mice-and-pmm">Impute missing quantitative values with MICE and PMM</h4>
 
-<p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3074241/">Multiple Imputation with Chained Equations (MICE)</a> is principled method of imputing missing data. It can be combined with <a href="http://stefvanbuuren.name/fimd/sec-pmm.html">Predictive Mean Matching (PMM)</a> to yield a powerful implementation method. One can find these methods implemented in Python in <code class="highlighter-rouge">statsmodels.imputation.mice</code>.</p>
+<p><a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3074241/">Multiple Imputation with Chained Equations (MICE)</a> is principled method of imputing missing data. It can be combined with <a href="http://stefvanbuuren.name/fimd/sec-pmm.html">Predictive Mean Matching (PMM)</a> to yield a powerful implementation method. One can find these methods implemented in Python in <code class="language-plaintext highlighter-rouge">statsmodels.imputation.mice</code>.</p>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># impute missing quantitative values with MICE and PMM</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">impute_quants</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s">'SalePrice'</span><span class="p">)</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># impute missing quantitative values with MICE and PMM
+</span><span class="n">clean</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">clean</span><span class="o">.</span><span class="n">impute_quants</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="s">'SalePrice'</span><span class="p">)</span>
 </code></pre></div></div>
 
-<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># missing value counts again</span>
-<span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># missing value counts again
+</span><span class="n">clean</span><span class="o">.</span><span class="n">na_counts</span><span class="p">()</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s">'SalePrice'</span><span class="p">])</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Series([], dtype: int64)
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Series([], dtype: int64)
 </code></pre></div></div>
 
 <h3 id="enforce-dtypes">Enforce dtypes</h3>
 
-<p>On top of our <code class="highlighter-rouge">col_kinds</code> dictionary, we’ll use pandas dtypes to track categorical, ordinal, and quantitative variables</p>
+<p>On top of our <code class="language-plaintext highlighter-rouge">col_kinds</code> dictionary, we’ll use pandas dtypes to track categorical, ordinal, and quantitative variables</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cats</span><span class="p">,</span> <span class="n">ords</span><span class="p">,</span> <span class="n">quants</span> <span class="o">=</span> <span class="p">(</span><span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'cat'</span><span class="p">],</span> <span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'ord'</span><span class="p">],</span>
                           <span class="n">clean</span><span class="o">.</span><span class="n">col_kinds</span><span class="p">[</span><span class="s">'quant'</span><span class="p">])</span>
@@ -1789,7 +1786,7 @@ dtype: int64
 <span class="n">clean</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">info</span><span class="p">()</span>
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;class 'pandas.core.frame.DataFrame'&gt;
 MultiIndex: 2917 entries, (train, 1) to (test, 2919)
 Data columns (total 78 columns):
 MSSubClass       2917 non-null category
@@ -1879,8 +1876,8 @@ memory usage: 1.4+ MB
 <p>Finally we’ll save our datasets to disk. This will result in two files</p>
 
 <ul>
-  <li><code class="highlighter-rouge">orig.csv</code> - Original train and test data combined in a single dataset, without any modification</li>
-  <li><code class="highlighter-rouge">clean.csv</code> - Cleaned dataset, with problematic variables and observations dropped and missing values imputed</li>
+  <li><code class="language-plaintext highlighter-rouge">orig.csv</code> - Original train and test data combined in a single dataset, without any modification</li>
+  <li><code class="language-plaintext highlighter-rouge">clean.csv</code> - Cleaned dataset, with problematic variables and observations dropped and missing values imputed</li>
 </ul>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">hp_data</span> <span class="o">=</span> <span class="n">DataPlus</span><span class="p">({</span><span class="s">'orig'</span><span class="p">:</span> <span class="n">orig</span><span class="p">,</span> <span class="s">'clean'</span><span class="p">:</span> <span class="n">clean</span><span class="p">})</span>
