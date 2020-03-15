@@ -427,7 +427,7 @@ full.loc['test'].shape
 
 Note: all the functions in [this section](#drop-problematic-variables-and-observations) are rolled into `HPDataFramePlus` methods `encode_ords, drop_probs`
 
-Before we clean any data, we'll store the original dataset so we have an unadulaterated copy
+Before we clean any data, we'll store the original dataset so we have an unadulterated copy
 
 
 ```python
@@ -436,8 +436,7 @@ orig = HPDataFramePlus(data=full)
 ```
 
 ### Classify variables by kind
-
-Since it doesn't affect the data, we'll group variables in the original dataset into categorical, ordinal and quantitative kinds. We'll use the custom class `HPDataFramePlus` which contains helpful methods
+Now we group variables in the original dataset into categorical, ordinal and quantitative kinds. We'll use the custom class `HPDataFramePlus` which contains helpful methods. 
 
 
 ```python
@@ -1086,8 +1085,6 @@ orig.print_desc(cols)
     	 Partial - Home was not completed when last assessed (associated with New Homes)
     
     
-
-
 To classify the variables, there's really no alternative here other than to carefully inspect the variable descriptions and determine which is which. To clarify our terms:
 
 - Categorical variables are discrete variables with no ordering (although they may have a numerical encoding)
@@ -1573,7 +1570,7 @@ clean.data = drop_mostly_missing_cols(clean)
 clean.update_col_kinds(clean.col_kinds)
 ```
 
-We'll also drop some well-known outlying observations (at least, well-known on Kaggle ) in the training data. Dropping outliers is (for good reason) very controversial, and one should take great care in doing so. The justification for it depends on context, however. In our case, the end goal is to predict `SalePrice` accuractely. If dropping outliers improves the ability of our prediction model to generalize, than this may provide some retroactive justification.
+We'll also drop some well-known (on Kaggle at least)outlying observations  in the training data. Dropping outliers is (for good reason) controversial, and one should take great care in doing so. The justification for it depends on context, however. In our case, the end goal is to predict `SalePrice` accuractely. If dropping outliers improves the ability of our prediction model to generalize, than this may provide some retroactive justification.
 
 First we'll plot the outliers (identifying them by their relationship to `SalePrice`)
 
@@ -1586,9 +1583,7 @@ plot_outliers(clean)
 ![png]({{site.baseurl}}/assets/images/process_42_0.png)
 
 
-Kagglers seem to frequently conclude that the outliers are the house with overall quality 4 but a sale price of more than \\$250,000, and the two houses with more than 4500 sq ft of general living area but sale prices less than \\$300,000.
-
-Whether this is well-justified, and how much it's an example of groupthink, is a matter for debate. But it seems to regularly improve the predictive capability of models, so we'll follow suit.
+Kagglers seem to frequently conclude that the outliers are the house with overall quality 4 but a sale price of more than $250,000, and the two houses with more than 4500 sq ft of general living area but sale prices less than $300,000. Since it seems to regularly improve the predictive capability of models, so we'll follow suit.
 
 
 ```python
@@ -1742,14 +1737,14 @@ plot_both_train_and_test_missing_values(clean)
 ```
 
 
-![png]({{site.baseurl}}/assets/images/process_58_0.png)
+![png]({{site.baseurl}}/assets/images/process_55_0.png)
 
 
 For variables missing values in both sets, the distributions are very similar, so we'll go ahead and impute these values
 
 #### Impute small numbers of missing values by hand
 
-Imputation of missing values using point estimates (mean, mode, etc.) is very common but arguable somewhat crude. Since there are more sophisticated methods which aren't too difficult to use, we'd like to use them. They are however, a bit more computationally expensive. Since many of our variables are only missing a few values, imputing these values by hand using point estimates will cut down on computational cost while sacrificing little.
+Imputation of missing values using point estimates (mean, mode, etc.) is very common but can be too simplistic. Since there are more sophisticated methods which aren't too difficult to use, we'd like to use them. They are however, a bit more computationally expensive. Since many of our variables are only missing a few values, imputing these values by hand using point estimates will cut down on computational cost while sacrificing little.
 
 An excellent, thorough treatment of imputation can be found in [Flexible Imputation of Missing Data](https://stefvanbuuren.name/fimd/) by Stef Van Buren.
 
@@ -1779,7 +1774,7 @@ clean.na_counts().drop(index=['SalePrice'])
 
 #### Impute missing categorical values with `XGBClassifier`
 
-Some methods for imputing missing categorical data are more common, e.g. multinomial classification, but any classifier will do. Given time and the inclination, one could explore different classifiers and try to estimate their imputation accuracy (e.g. by cross-validation on data with no missing values) but we won't do that here. Since `xgboost` classifier often performs very well with defaults, we'll use it to impute `MasVnrType` and `GarageType`.
+Some methods for imputing missing categorical data are more common, e.g. multinomial classification, but any classifier may do. Given time and the inclination, one could explore different classifiers and try to estimate their imputation accuracy (e.g. by cross-validation on data with no missing values) but we won't do that here. Since `xgboost` classifier often performs very well with defaults, we'll use it to impute `MasVnrType` and `GarageType`.
 
 
 ```python

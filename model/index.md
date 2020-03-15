@@ -81,7 +81,7 @@ hp_data = load_datasets(data_dir='../data', file_names=['clean.csv'])
 clean = hp_data.dfs['clean']
 ```
 
-The dataset `clean` was ([created in a previous notebook](process.ipynb/#Processing-and-cleaning-the-Ames-housing-dataset). It is the original dataset with someproblematic variables and observations dropped and missing values imputed. We'll use it to create our modeling data
+The dataset `clean` was [created in a previous notebook](process.ipynb/#Processing-and-cleaning-the-Ames-housing-dataset). It is the original dataset with some problematic variables and observations dropped and missing values imputed. We'll use it to create our modeling data
 
 ## Feature selection and engineering
 

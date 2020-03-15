@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 <url>
-<loc>https://rmwenzel.com/ames_house_prices/explore/</loc>
+<loc>http://localhost:4001/ames_house_prices/explore/</loc>
 </url>
 <url>
-<loc>https://rmwenzel.com/ames_house_prices/model/</loc>
+<loc>http://localhost:4001/ames_house_prices/model/</loc>
 </url>
 <url>
-<loc>https://rmwenzel.com/ames_house_prices/process/</loc>
+<loc>http://localhost:4001/ames_house_prices/process/</loc>
 </url>
 <url>
-<loc>https://rmwenzel.com/ames_house_prices/</loc>
+<loc>http://localhost:4001/ames_house_prices/</loc>
 </url>
 </urlset>

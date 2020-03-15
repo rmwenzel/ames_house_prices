@@ -3,7 +3,8 @@ layout: page
 title: Exploratory analysis
 ---
 
-In a [previous notebook](process.ipynb/#Processing-the-Ames-housing-dataset), we processed and cleaned the Ames housing dataset. In this notebook, we focus on exploring the variables and the relationships among them. In a [later notebook](model.ipynb/#Modeling-and-predicting-SalePrice) we'll model and predict sale prices.
+In a previous notebook, we [processed and cleaned]({{site.baseurl}}/process/) the Ames housing dataset. In this notebook, we focus on exploring the variables and the relationships among them. In a later notebook we'll 
+[model]({{site.baseurl}}/model/) and predict sale prices.
 
 ## Contents
 
@@ -17,17 +18,17 @@ In a [previous notebook](process.ipynb/#Processing-the-Ames-housing-dataset), we
 		- [Kolmogorov-Smirnov test](#kolmogorov-smirnov-test)
 
 - [Categorical variables](#categorical-variables)
-	-[Distributions of categorical variables](#distributions-of-categorical-variables)
+  - [Distributions of categorical variables](#distributions-of-categorical-variables)
 	- [Relationships among categorical variables](#relationships-among-categorical-variables)
 	- [Relationships between categoricals and `SalePrice`](#relationships-between-categoricals-and-saleprice)
 
 - [Ordinal variables](#ordinal-variables)
-	-[Distributions of ordinal variables](#distributions-of-ordinal-variables)
+	- [Distributions of ordinal variables](#distributions-of-ordinal-variables)
 	- [Relationships among ordinal variables](#relationships-among-ordinal-variables)
 	- [Relationships between ordinals and `SalePrice`](#relationships-between-ordinals-and-saleprice)
 
 - [Quantitative variables](#quantitative-variables)
-	-[Distributions of quantitative variables](#distributions-of-quantitative-variables)
+  - [Distributions of quantitative variables](#distributions-of-quantitative-variables)
 	- [Relationships among quantitative variables](#relationships-among-quantitative-variables)
 	- [Relationships between quantitatives and `SalePrice`](#relationships-between-quantitatives-and-saleprice)
 
@@ -1044,6 +1045,8 @@ unbal_cat_cols = print_unbal_dists(data=cats.data, bal_threshold=0.9)
 
 ### Relationships among categorical variables
 
+{% katexmm %}
+
 One often speaks loosely of "correlation" among variables to refer to statistical dependence. There are various measures of dependence, but here we rely on an information theoretic measure known as the [variation of information](https://en.wikipedia.org/wiki/Variation_of_information). We discuss this measure briefly
 
 The function
@@ -1060,7 +1063,9 @@ $$D(X, Y) = \frac{d(X, Y)}{H(X, Y)} = 1 - \frac{I(X, Y)}{H(X, Y)} $$
 
 i.e. $D(X, Y) \in [0, 1]$. Since $D$ is a metric, $D(X, Y) = 0$ iff $X = Y$ Furthermore, $D(X, Y) = 1$ if and only if $I(X, Y) = 0$ if and only if $X, Y$ are independendent. So we can take $D(X, Y)$ as a "dependence distance". The closer a variable $Y$ is to $X$, the more it depends on $X$. 
 
-Of course, we don't know the true distributions of the random variables in this data set, but the sample size is large enough that the sample distributions should be a good approximation.
+Of course, we don't know the true distributions of the random variables in this data set, but the sample size is large enough that the sample distributions should be a good approximation. 
+
+We'll look at the dependence distance among variables with feature selection in mind, namely the possibility of removing redundant variables.
 
 
 ```python
@@ -1151,13 +1156,14 @@ rank_pairs_by_D(D_dep_df=cats_D_dep_df, D_threshold=0.8)
 </div>
 
 
-
  Notable pairs of distinct variables with low dependence distance are
  
 - `Exterior1st` and `Exterior2nd` have the lowest dependence distance ($D \approx 0.322$). Their distributions are very similar and they have the same values. It probably makes more sense to think of them as close to identically distributed. 
 - `MSSubclass` and `HouseStyle` have the next lowest ($D \approx 0.47$). Inspecting their descriptions above we see that they have very similar categories, so they are measuring very similar things. `BldgType` and `MSSubclass` ($D \approx 0.71$) are similar. 
 - `MSSubclass` and `Neighborhood` ($D \approx 0.84$) are perhaps the first interesting pair in that they are measuring different things. We can imagine that the association between these two variables is somewhat strong -- it makes sense that the size/age/type of house would be related to the neighborhood. Similarly, `Exterior1st`, `Exterior2nd`, `MSZoning`, `Foundation` also have strong associations with `Neighborhood`.
 - `SaleCondition` and `SaleType` ($D \approx 0.67$) are also unsurprisingly associated. 
+
+{% endkatexmm %}
 
 ### Relationships between categoricals and `SalePrice`
 
@@ -1964,13 +1970,15 @@ rank_pairs_by_D(D_dep_df=ords_D_dep_df, D_threshold=0.8)
 </table>
 </div>
 
-
+{% katexmm %}
 
  Notable pairs of distinct ordinal variables with low dependence distance are
  
 - `Fireplaces` and `FireplaceQu` have the lowest dependence distance ($D \approx 0.53$). This is somewhat interesting, in that the quantities these variables are measuring are distinct (albeit related).
 - `GarageQual` and `GarageCond` have the next lowest ($D \approx 0.54$). Inspecting their descriptions above we see that they have very similar categories, so they are measuring very similar things. There is ostensibly a distinction between the quality of the garage and its condition, however.
 - Pairs of garage variables display relatively low dependence distance, as do pairs of basement variables and quality variables.
+
+{% endkatexmm %}
 
 ### Relationships between ordinals and `SalePrice`
 
@@ -2097,6 +2105,8 @@ Again variables with unbalanced distributions (e.g. `PoolQc`, `Utilities`) tend 
 That `OverallQual` has high dependence with `SalePrice` isn't surprising, but perhaps `MoSold` having the lowest is.
 
 #### Rank correlation hypothesis tests
+
+{% katexmm %}
 
 One way of testing statistical dependence between ordered varialbes is using [rank correlations](https://en.wikipedia.org/wiki/Rank_correlation). Since they're relatively straightforward to calculate, we calculate three common ones and compare. We'll look at [Pearson's $\rho$](https://en.wikipedia.org/wiki/Pearson_correlation_coefficient), [Spearman's $r_s$](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient), and [Kendall's $\tau$](https://en.wikipedia.org/wiki/Kendall_rank_correlation_coefficient)
 
@@ -2447,7 +2457,9 @@ get_rank_corr_df(rank_hyp_test_dfs).drop(columns=['rho', 'r_s', 'tau']).sort_val
 
 There is more or less good agreement of $p$-value rankings among the rank correlation hypothesis tests. In particular for a 95% significance level all three fail to reject the null for `MoSold`, `ExterCond`, `OverallCond`, `LandSlope`, `BsmtFinType2`, `Utilities` and `BsmtHalfBath`. Applying a stricter value of 99.9% significance, all three reject `PoolQC` as well.
 
-It's important to recognize that rank correlation tests are measures of monotonicity (the tendency of variables to increase together and decrease together). They may fail to detect non-linear relationships that are not monotonic. In our particular case, `MoSold` had the highest statistical dependence with `log_SalePrice` among ordinal variables, but all three rank correlation tests reject a relationship between the two at 95\% significance.
+It's important to recognize that rank correlation tests are measures of monotonicity (the tendency of variables to increase together and decrease together). They may fail to detect non-linear relationships that are not monotonic. In our particular case, `MoSold` had the highest statistical dependence with `log_SalePrice` among ordinal variables, but all three rank correlation tests reject a relationship between the two at 95% significance.
+
+{% endkatexmm %}
 
 ## Quantitative variables
 
@@ -3038,12 +3050,13 @@ rank_pairs_by_D(D_dep_df=quants_D_dep_df, D_threshold=0.8).head(10)
 </div>
 
 
+{% katexmm %}
 
 Compared to quantitative and ordinal variables pairs, pairs of quantitative variables are showing much higher dependencies (lower dependence distances) overall. For many of these pairs , the high dependence makes sense given both variables are measuring very similar areas, for example, `1stFlrSF`, `GrLivArea` and `TotalBsmtSF`.
 
 We expect that Pearsons' $\rho$ (i.e. correlation/linear dependence) of these variables should be high as well.
 
-
+{% endkatexmm %}
 ```python
 # plot pearson's correlation for quantitative variables
 plot_corr(quants_data=quants.data, figsize=(15, 10))
@@ -3291,6 +3304,9 @@ D_dep_response(data=quants.data, response='log_SalePrice').sort_values(by='D').T
 <p>1 rows × 22 columns</p>
 </div>
 
-
+{% katexmm %}
 
 Considering the scatterplots and taking into account the dependence distance $D$, we see that some quantitative variables appear likely to be less helpful in predicting `SalePrice`. Of these, `EnclosedPorch`, `BsmtFinSF2`, `ScreenPorch`, `MiscVal`, `LowQualFinSF`, `3SSnPorch`, and `PoolArea` stand out (all have $D \gt 0.8$)
+
+
+{% endkatexmm %}
