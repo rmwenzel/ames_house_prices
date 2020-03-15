@@ -1,1 +1,1 @@
-Sitemap: https://rmwenzel.com/ames_house_prices/sitemap.xml
+Sitemap: http://localhost:4001/ames_house_prices/sitemap.xml
